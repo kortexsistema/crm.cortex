@@ -134,7 +134,7 @@ function buildState(args: {
     name: agent?.name ?? "",
     description: agent?.description ?? "",
     priority: agent?.priority ?? 0,
-    provider: (version?.provider as Provider) ?? "anthropic",
+    provider: (version?.provider as Provider) ?? "google",
     model: version?.model ?? "",
     credential_id: version?.credential_id ?? "",
     channel_session_id: version?.channel_session_id ?? "",
@@ -466,9 +466,9 @@ export function AgentForm(props: Props) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="google">Google (Gemini)</SelectItem>
                   <SelectItem value="anthropic">Anthropic</SelectItem>
                   <SelectItem value="openai">OpenAI</SelectItem>
-                  <SelectItem value="google">Google (Gemini)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

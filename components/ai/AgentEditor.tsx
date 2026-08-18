@@ -56,7 +56,7 @@ function buildFormState(agent: AgentRow): FormState {
   const guardrails: GuardrailItem[] = grParsed.success ? grParsed.data : [];
 
   const modelOk = (AGENT_MODELS as readonly string[]).includes(agent.model);
-  const model: AgentModel = (modelOk ? agent.model : "anthropic/claude-sonnet-4-6") as AgentModel;
+  const model: AgentModel = (modelOk ? agent.model : "google/gemini-1.5-flash") as AgentModel;
 
   return {
     name: agent.name,

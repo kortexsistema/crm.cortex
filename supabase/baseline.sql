@@ -9299,3 +9299,6 @@ $$;
 
 REVOKE ALL ON FUNCTION public.fn_get_user_id_by_email FROM public, anon;
 GRANT EXECUTE ON FUNCTION public.fn_get_user_id_by_email TO service_role;
+
+-- ---- ai_agents_default_gemini (migration 0120) ----
+ALTER TABLE public.ai_agents ALTER COLUMN model SET DEFAULT 'google/gemini-1.5-flash';

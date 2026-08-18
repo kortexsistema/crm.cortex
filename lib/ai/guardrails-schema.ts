@@ -9,6 +9,8 @@ import { z } from "zod";
 // ---------------------------------------------------------------------------
 
 export const AGENT_MODELS = [
+  "google/gemini-1.5-flash",
+  "google/gemini-1.5-pro",
   "anthropic/claude-sonnet-4-6",
   "anthropic/claude-haiku-4-5",
   "anthropic/claude-opus-4-7",

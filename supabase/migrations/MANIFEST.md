@@ -171,3 +171,4 @@ To re-apply on a fresh Supabase project, replay the migrations in version order 
 - **Integrations**: tenant_integrations, orders, nuvemshop_products
 - **Compliance**: lgpd_requests
 - **Ops**: incidents
+| `20260818175000` | `0120_ai_agent_default_gemini` | Altera o valor padrão da coluna model em ai_agents para google/gemini-1.5-flash, tornando o Gemini a IA padrão do sistema em vez do Anthropic. Idempotente (apenas altera o schema default). |

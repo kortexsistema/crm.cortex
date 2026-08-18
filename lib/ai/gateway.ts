@@ -23,6 +23,8 @@ import { env } from "@/lib/env";
 export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 
 export type ModelId =
+  | "google/gemini-1.5-flash"
+  | "google/gemini-1.5-pro"
   | "anthropic/claude-sonnet-5"
   | "anthropic/claude-opus-5"
   | "anthropic/claude-haiku-4-5"
@@ -30,14 +32,15 @@ export type ModelId =
   // Allow arbitrary tenant-configured strings without losing autocomplete on the canonical ones.
   | (string & {});
 
-export const DEFAULT_BOT_MODEL: ModelId = "anthropic/claude-sonnet-5";
-export const DEFAULT_CLASSIFIER_MODEL: ModelId = "anthropic/claude-haiku-4-5";
+export const DEFAULT_BOT_MODEL: ModelId = "google/gemini-1.5-flash";
+export const DEFAULT_CLASSIFIER_MODEL: ModelId = "google/gemini-1.5-flash";
 export const DEFAULT_EMBEDDING_MODEL: ModelId = "openai/text-embedding-3-small";
 
 export function isAiGatewayConfigured(): boolean {
   return (
     Boolean(env.AI_GATEWAY_API_KEY) ||
     Boolean(env.OPENROUTER_API_KEY) ||
+    Boolean(env.GEMINI_API_KEY) ||
     Boolean(env.ANTHROPIC_API_KEY) ||
     Boolean(env.GOOGLE_GENERATIVE_AI_API_KEY)
   );
@@ -90,10 +93,13 @@ export function resolveLanguageModel(model: ModelId): LanguageModel | null {
     return createOpenAI({ apiKey: env.OPENAI_API_KEY })(id.slice("openai/".length));
   }
 
-  if (id.startsWith("google/") && env.GOOGLE_GENERATIVE_AI_API_KEY) {
-    return createGoogleGenerativeAI({ apiKey: env.GOOGLE_GENERATIVE_AI_API_KEY })(
-      id.slice("google/".length),
-    );
+  if (id.startsWith("google/")) {
+    const geminiKey = env.GEMINI_API_KEY || env.GOOGLE_GENERATIVE_AI_API_KEY;
+    if (geminiKey) {
+      return createGoogleGenerativeAI({ apiKey: geminiKey })(
+        id.slice("google/".length),
+      );
+    }
   }
 
   return null;

@@ -95,6 +95,7 @@ const schema = z.object({
   VERCEL_AI_GATEWAY_URL: z.string().optional().default(""),
   ANTHROPIC_API_KEY: z.string().optional().default(""),
   OPENAI_API_KEY: z.string().optional().default(""),
+  GEMINI_API_KEY: z.string().optional().default(""),
   GOOGLE_GENERATIVE_AI_API_KEY: z.string().optional().default(""),
 
   // Fusão (Fase 4): DONO ÚNICO dos eventos ai_agent.dispatch_requested.
@@ -190,9 +191,9 @@ export const env = parsed.data;
 
 // Soft warning for env-gated AI keys (worker degrades gracefully but operators
 // should know when the bot is silent for config reasons).
-if (!env.AI_GATEWAY_API_KEY && !env.ANTHROPIC_API_KEY) {
+if (!env.AI_GATEWAY_API_KEY && !env.GEMINI_API_KEY && !env.ANTHROPIC_API_KEY) {
   console.warn(
-    "[env] No AI_GATEWAY_API_KEY or ANTHROPIC_API_KEY set — ai-response-worker will skip with reason='ai_gateway_key_missing'.",
+    "[env] No AI_GATEWAY_API_KEY, GEMINI_API_KEY or ANTHROPIC_API_KEY set — ai-response-worker will skip with reason='ai_gateway_key_missing'.",
   );
 }
 if (!env.OPENAI_API_KEY) {

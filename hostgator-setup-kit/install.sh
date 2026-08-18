@@ -877,7 +877,6 @@ fi
 FIELDS=(
   "DOMAIN|Domínio do CRM (ex: crm.suaempresa.com.br)||v_domain||"
   "ACME_EMAIL|Seu e-mail (avisos de SSL)||v_email||"
-  "APP_IMAGE|Imagem Docker do app|ghcr.io/kortexsistema/kortex-v1:latest|||"
   "NEXT_PUBLIC_SUPABASE_URL|Supabase Project URL (Settings > API)||v_supabase_url||"
   "NEXT_PUBLIC_SUPABASE_ANON_KEY|Supabase anon key (Settings > API)||v_anon||"
   "SUPABASE_SERVICE_ROLE_KEY|Supabase service_role key (Settings > API)||v_service|secret|"
@@ -1039,6 +1038,9 @@ umask 077
 # arquivo com `source` — os scripts do kit e a receita do próprio README
 # (`source .env && curl ...`). O Docker Compose remove as aspas ao carregar,
 # então o contêiner recebe exatamente o valor digitado.
+
+APP_IMAGE="${APP_IMAGE:-ghcr.io/kortexsistema/kortex-v1:latest}"
+
 
 {
   printf '# Gerado por install.sh — NÃO comitar. Contém segredos.\n'

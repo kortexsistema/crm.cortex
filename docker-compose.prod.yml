@@ -43,6 +43,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.worker
+    pull_policy: build
     restart: unless-stopped
     env_file: .env
     environment:

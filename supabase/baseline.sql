@@ -582,26 +582,24 @@ begin
     raise exception 'version_invalid_state' using errcode = 'P0001';
   end if;
 
-  if v_version.credential_id is null then
-    raise exception 'credential_missing' using errcode = 'P0001';
-  end if;
+  if v_version.credential_id is not null then
+    select c.id, c.organization_id, c.provider, c.is_active, c.validated_at
+      into v_credential
+    from public.ai_provider_credentials c
+    where c.id = v_version.credential_id;
 
-  select c.id, c.organization_id, c.provider, c.is_active, c.validated_at
-    into v_credential
-  from public.ai_provider_credentials c
-  where c.id = v_version.credential_id;
-
-  if not found or v_credential.organization_id <> p_org_id then
-    raise exception 'credential_not_found' using errcode = 'P0001';
-  end if;
-  if not v_credential.is_active then
-    raise exception 'credential_inactive' using errcode = 'P0001';
-  end if;
-  if v_credential.validated_at is null then
-    raise exception 'credential_not_validated' using errcode = 'P0001';
-  end if;
-  if v_credential.provider <> v_version.provider then
-    raise exception 'credential_provider_mismatch' using errcode = 'P0001';
+    if not found or v_credential.organization_id <> p_org_id then
+      raise exception 'credential_not_found' using errcode = 'P0001';
+    end if;
+    if not v_credential.is_active then
+      raise exception 'credential_inactive' using errcode = 'P0001';
+    end if;
+    if v_credential.validated_at is null then
+      raise exception 'credential_not_validated' using errcode = 'P0001';
+    end if;
+    if v_credential.provider <> v_version.provider then
+      raise exception 'credential_provider_mismatch' using errcode = 'P0001';
+    end if;
   end if;
 
   select s.id, s.organization_id, s.status
@@ -6295,26 +6293,24 @@ begin
     raise exception 'version_invalid_state' using errcode = 'P0001';
   end if;
 
-  if v_version.credential_id is null then
-    raise exception 'credential_missing' using errcode = 'P0001';
-  end if;
+  if v_version.credential_id is not null then
+    select c.id, c.organization_id, c.provider, c.is_active, c.validated_at
+      into v_credential
+    from public.ai_provider_credentials c
+    where c.id = v_version.credential_id;
 
-  select c.id, c.organization_id, c.provider, c.is_active, c.validated_at
-    into v_credential
-  from public.ai_provider_credentials c
-  where c.id = v_version.credential_id;
-
-  if not found or v_credential.organization_id <> p_org_id then
-    raise exception 'credential_not_found' using errcode = 'P0001';
-  end if;
-  if not v_credential.is_active then
-    raise exception 'credential_inactive' using errcode = 'P0001';
-  end if;
-  if v_credential.validated_at is null then
-    raise exception 'credential_not_validated' using errcode = 'P0001';
-  end if;
-  if v_credential.provider <> v_version.provider then
-    raise exception 'credential_provider_mismatch' using errcode = 'P0001';
+    if not found or v_credential.organization_id <> p_org_id then
+      raise exception 'credential_not_found' using errcode = 'P0001';
+    end if;
+    if not v_credential.is_active then
+      raise exception 'credential_inactive' using errcode = 'P0001';
+    end if;
+    if v_credential.validated_at is null then
+      raise exception 'credential_not_validated' using errcode = 'P0001';
+    end if;
+    if v_credential.provider <> v_version.provider then
+      raise exception 'credential_provider_mismatch' using errcode = 'P0001';
+    end if;
   end if;
 
   select s.id, s.organization_id, s.status

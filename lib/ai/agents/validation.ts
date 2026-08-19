@@ -63,7 +63,7 @@ const versionShapeSchema = z
     system_prompt: z.string().trim().min(10).max(20000),
     provider: z.enum(PROVIDERS),
     model: z.string().trim().min(1).max(120),
-    credential_id: UUID,
+    credential_id: UUID.nullable().optional(),
     tool_ids: z
       .array(z.string().min(1).max(80))
       // O mesmo teto que a tela mostra ("13 de 20") é o que o servidor recusa —

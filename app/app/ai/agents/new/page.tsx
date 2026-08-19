@@ -38,6 +38,7 @@ export default async function NewAgentPage() {
         mode="create"
         credentials={credentials}
         channelSessions={channelSessions}
+        isPlatformAdmin={user.is_platform_admin}
       />
     </div>
   );

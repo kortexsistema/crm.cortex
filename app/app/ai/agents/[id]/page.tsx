@@ -107,6 +107,7 @@ export default async function AgentEditorPage({
         channelSessions={channelSessions}
         routerMembership={routerMembership}
         readOnly={readOnly}
+        isPlatformAdmin={user.is_platform_admin}
       />
     </div>
   );

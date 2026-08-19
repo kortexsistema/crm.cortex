@@ -68,6 +68,7 @@ interface BaseProps {
   channelSessions: ChannelSessionLite[];
   routerMembership?: { routerId: string; routerName: string } | null;
   readOnly?: boolean;
+  isPlatformAdmin?: boolean;
 }
 
 interface EditProps extends BaseProps {
@@ -135,7 +136,7 @@ function buildState(args: {
     description: agent?.description ?? "",
     priority: agent?.priority ?? 0,
     provider: (version?.provider as Provider) ?? "google",
-    model: version?.model ?? "",
+    model: version?.model || "google/gemini-3.5-flash",
     credential_id: version?.credential_id ?? "",
     channel_session_id: version?.channel_session_id ?? "",
     system_prompt:
@@ -166,7 +167,7 @@ function toVersionPayload(s: FormState) {
     system_prompt: s.system_prompt,
     provider: s.provider,
     model: s.model,
-    credential_id: s.credential_id,
+    credential_id: s.credential_id || null,
     tool_ids: s.tool_ids,
     trigger_config: s.trigger_config,
     channel_session_id: s.channel_session_id,
@@ -233,9 +234,11 @@ export function AgentForm(props: Props) {
       errors.system_prompt = "Escreva as instruções do agente (pelo menos uma frase).";
     if (form.system_prompt.length > 20000)
       errors.system_prompt = "As instruções passaram de 20.000 caracteres.";
-    if (!form.model) errors.model = "Escolha o modelo de inteligência artificial.";
-    if (!form.credential_id)
-      errors.credential_id = "Escolha a chave de acesso da empresa de inteligência artificial.";
+    if (props.isPlatformAdmin) {
+      if (!form.model) errors.model = "Escolha o modelo de inteligência artificial.";
+      if (!form.credential_id)
+        errors.credential_id = "Escolha a chave de acesso da empresa de inteligência artificial.";
+    }
     if (!form.channel_session_id)
       errors.channel_session_id = "Escolha por qual número de WhatsApp ele atende.";
     if (form.tool_ids.length > TETO_TOOLS_POR_AGENTE)
@@ -260,9 +263,11 @@ export function AgentForm(props: Props) {
     if (!props.draft) return "Sem rascunho para publicar.";
     if (!isValid) return "Resolva os erros do formulário.";
     if (dirty) return "Salve o rascunho antes de publicar.";
-    if (!cred) return "Escolha a chave de acesso da empresa de inteligência artificial.";
-    if (credSt !== "validated")
-      return `Credencial ${form.provider} ${credSt === "invalid" ? "inválida" : "ainda não validada"}.`;
+    if (props.isPlatformAdmin) {
+      if (!cred) return "Escolha a chave de acesso da empresa de inteligência artificial.";
+      if (credSt !== "validated")
+        return `Credencial ${form.provider} ${credSt === "invalid" ? "inválida" : "ainda não validada"}.`;
+    }
     if (!channelSession) return "Escolha por qual número de WhatsApp ele atende.";
     if (channelSession.status !== "working" && channelSession.status !== "WORKING")
       return `Número WhatsApp não está conectado (status: ${channelSession.status}).`;
@@ -453,54 +458,56 @@ export function AgentForm(props: Props) {
           </Card>
 
           {/* Provider + credential + model */}
-          <Card className="space-y-3 p-4">
-            <h3 className="text-sm font-medium">A inteligência que ele usa</h3>
-            <div className="space-y-1">
-              <Label htmlFor="provider">Empresa de inteligência artificial</Label>
-              <Select
-                value={form.provider}
-                onValueChange={(v) => changeProvider(v as Provider)}
+          {props.isPlatformAdmin && (
+            <Card className="space-y-3 p-4">
+              <h3 className="text-sm font-medium">A inteligência que ele usa</h3>
+              <div className="space-y-1">
+                <Label htmlFor="provider">Empresa de inteligência artificial</Label>
+                <Select
+                  value={form.provider}
+                  onValueChange={(v) => changeProvider(v as Provider)}
+                  disabled={disabled}
+                >
+                  <SelectTrigger id="provider">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="google">Google (Gemini)</SelectItem>
+                    <SelectItem value="anthropic">Anthropic</SelectItem>
+                    <SelectItem value="openai">OpenAI</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <ModelPicker
+                provider={form.provider}
+                value={form.model}
+                onChange={(modelId) => patch({ model: modelId })}
                 disabled={disabled}
-              >
-                <SelectTrigger id="provider">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="google">Google (Gemini)</SelectItem>
-                  <SelectItem value="anthropic">Anthropic</SelectItem>
-                  <SelectItem value="openai">OpenAI</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+                id="model"
+              />
+              {validation.model ? (
+                <p className="text-xs text-destructive">{validation.model}</p>
+              ) : null}
 
-            <ModelPicker
-              provider={form.provider}
-              value={form.model}
-              onChange={(modelId) => patch({ model: modelId })}
-              disabled={disabled}
-              id="model"
-            />
-            {validation.model ? (
-              <p className="text-xs text-destructive">{validation.model}</p>
-            ) : null}
-
-            <CredentialPicker
-              provider={form.provider}
-              credentials={props.credentials}
-              value={form.credential_id}
-              onChange={(id) => patch({ credential_id: id })}
-              disabled={disabled}
-              id="credential_id"
-            />
-            {validation.credential_id ? (
-              <p className="text-xs text-destructive">{validation.credential_id}</p>
-            ) : null}
-            {cred && credSt !== "validated" ? (
-              <p className="text-xs text-amber-600 dark:text-amber-400">
-                Credencial selecionada está com status {credSt}. Publish bloqueado até validar.
-              </p>
-            ) : null}
-          </Card>
+              <CredentialPicker
+                provider={form.provider}
+                credentials={props.credentials}
+                value={form.credential_id}
+                onChange={(id) => patch({ credential_id: id })}
+                disabled={disabled}
+                id="credential_id"
+              />
+              {validation.credential_id ? (
+                <p className="text-xs text-destructive">{validation.credential_id}</p>
+              ) : null}
+              {cred && credSt !== "validated" ? (
+                <p className="text-xs text-amber-600 dark:text-amber-400">
+                  Credencial selecionada está com status {credSt}. Publish bloqueado até validar.
+                </p>
+              ) : null}
+            </Card>
+          )}
 
           {/* WhatsApp session */}
           <Card className="space-y-3 p-4">
@@ -551,77 +558,79 @@ export function AgentForm(props: Props) {
           </Card>
 
           {/* Limits */}
-          <Card className="space-y-3 p-4">
-            <h3 className="text-sm font-medium">Freios de segurança</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label htmlFor="max_steps">Ações por atendimento (1 a 25)</Label>
-                <Input
-                  id="max_steps"
-                  type="number"
-                  min={1}
-                  max={25}
-                  value={form.max_steps}
-                  onChange={(e) => patch({ max_steps: Number(e.target.value) })}
-                  disabled={disabled}
-                />
+          {props.isPlatformAdmin && (
+            <Card className="space-y-3 p-4">
+              <h3 className="text-sm font-medium">Freios de segurança</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="max_steps">Ações por atendimento (1 a 25)</Label>
+                  <Input
+                    id="max_steps"
+                    type="number"
+                    min={1}
+                    max={25}
+                    value={form.max_steps}
+                    onChange={(e) => patch({ max_steps: Number(e.target.value) })}
+                    disabled={disabled}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="token_budget">Volume de texto por atendimento</Label>
+                  <Input
+                    id="token_budget"
+                    type="number"
+                    min={1000}
+                    max={500000}
+                    step={1000}
+                    value={form.token_budget}
+                    onChange={(e) => patch({ token_budget: Number(e.target.value) })}
+                    disabled={disabled}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="cost_budget_cents">Custo máximo por atendimento (centavos)</Label>
+                  <Input
+                    id="cost_budget_cents"
+                    type="number"
+                    min={1}
+                    max={10000}
+                    value={form.cost_budget_cents}
+                    onChange={(e) => patch({ cost_budget_cents: Number(e.target.value) })}
+                    disabled={disabled}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="history_message_window">Mensagens anteriores que ele lê</Label>
+                  <Input
+                    id="history_message_window"
+                    type="number"
+                    min={0}
+                    max={200}
+                    value={form.history_message_window}
+                    onChange={(e) =>
+                      patch({ history_message_window: Number(e.target.value) })
+                    }
+                    disabled={disabled}
+                  />
+                </div>
+                <div className="col-span-2 space-y-1">
+                  <Label htmlFor="history_token_window">Tamanho máximo desse histórico</Label>
+                  <Input
+                    id="history_token_window"
+                    type="number"
+                    min={0}
+                    max={50000}
+                    step={500}
+                    value={form.history_token_window}
+                    onChange={(e) =>
+                      patch({ history_token_window: Number(e.target.value) })
+                    }
+                    disabled={disabled}
+                  />
+                </div>
               </div>
-              <div className="space-y-1">
-                <Label htmlFor="token_budget">Volume de texto por atendimento</Label>
-                <Input
-                  id="token_budget"
-                  type="number"
-                  min={1000}
-                  max={500000}
-                  step={1000}
-                  value={form.token_budget}
-                  onChange={(e) => patch({ token_budget: Number(e.target.value) })}
-                  disabled={disabled}
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="cost_budget_cents">Custo máximo por atendimento (centavos)</Label>
-                <Input
-                  id="cost_budget_cents"
-                  type="number"
-                  min={1}
-                  max={10000}
-                  value={form.cost_budget_cents}
-                  onChange={(e) => patch({ cost_budget_cents: Number(e.target.value) })}
-                  disabled={disabled}
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="history_message_window">Mensagens anteriores que ele lê</Label>
-                <Input
-                  id="history_message_window"
-                  type="number"
-                  min={0}
-                  max={200}
-                  value={form.history_message_window}
-                  onChange={(e) =>
-                    patch({ history_message_window: Number(e.target.value) })
-                  }
-                  disabled={disabled}
-                />
-              </div>
-              <div className="col-span-2 space-y-1">
-                <Label htmlFor="history_token_window">Tamanho máximo desse histórico</Label>
-                <Input
-                  id="history_token_window"
-                  type="number"
-                  min={0}
-                  max={50000}
-                  step={500}
-                  value={form.history_token_window}
-                  onChange={(e) =>
-                    patch({ history_token_window: Number(e.target.value) })
-                  }
-                  disabled={disabled}
-                />
-              </div>
-            </div>
-          </Card>
+            </Card>
+          )}
         </div>
 
         {/* COLUMN 2 */}

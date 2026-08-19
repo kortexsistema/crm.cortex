@@ -28,6 +28,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateText, stepCountIs, type LanguageModel, type StopCondition, type ToolSet } from "ai";
 
 import { CredentialUnavailableError, loadCredential } from "@/lib/ai/credentials";
+import { resolveLanguageModel, type ModelId } from "@/lib/ai/gateway";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { audit } from "@/lib/audit";
 import type { McpAuthResult } from "@/lib/mcp/auth";
@@ -239,16 +240,15 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
     const agent = agentRaw as AgentRow | null;
 
     // 4) Load credential. Plaintext lives only in this scope.
-    if (!version.credential_id) {
-      return await failRun(run, "credential_invalid", "version has no credential", startedAt);
-    }
-    let credentialApiKey: string;
-    try {
-      const credential = await loadCredential(version.credential_id, run.organization_id);
-      credentialApiKey = credential.apiKey;
-    } catch (err) {
-      const reason = err instanceof CredentialUnavailableError ? err.reason : "decrypt_failed";
-      return await failRun(run, `credential_${reason}`, "credential unavailable", startedAt);
+    let credentialApiKey: string | undefined;
+    if (version.credential_id) {
+      try {
+        const credential = await loadCredential(version.credential_id, run.organization_id);
+        credentialApiKey = credential.apiKey;
+      } catch (err) {
+        const reason = err instanceof CredentialUnavailableError ? err.reason : "decrypt_failed";
+        return await failRun(run, `credential_${reason}`, "credential unavailable", startedAt);
+      }
     }
 
     // 5) Resolve inbound text + dispatch context.
@@ -392,8 +392,17 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
         })
       : [];
 
-    // 9) Build LM directly against the provider (BYOK credential — see buildModel doc).
-    const model = buildModel(version.provider, credentialApiKey, version.model);
+    // 9) Build LM directly against the provider (BYOK credential) or fallback to global platform gateway.
+    let model: LanguageModel;
+    if (credentialApiKey) {
+      model = buildModel(version.provider, credentialApiKey, version.model);
+    } else {
+      const resolvedModel = resolveLanguageModel(version.model as ModelId);
+      if (!resolvedModel) {
+        return await failRun(run, "gateway_unconfigured", "global platform AI gateway not configured", startedAt);
+      }
+      model = resolvedModel;
+    }
 
     // 10) Cost/token guard. Fires BEFORE the next step is taken.
     let abortReason: string | null = null;

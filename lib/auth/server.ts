@@ -152,9 +152,9 @@ export async function isMfaEnrolled(): Promise<boolean> {
 }
 
 /**
- * MFA enforcement policy: platform admins and tenant `admin` role MUST enroll.
- * `manager`/`agent`/`viewer` are optional in MVP.
+ * MFA enforcement policy: platform admins MUST enroll.
+ * `admin`/`manager`/`agent`/`viewer` are optional in MVP.
  */
 export function requiresMfa(role: Role | undefined, isPlatformAdmin: boolean): boolean {
-  return isPlatformAdmin || role === "admin";
+  return isPlatformAdmin;
 }

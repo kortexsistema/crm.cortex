@@ -342,12 +342,13 @@ export function ConnectionsClient({ wahaConfigured }: { wahaConfigured: boolean 
                     disabled={!podeExcluir}
                     aria-label={
                       podeExcluir
-                        ? `Excluir ${channelLabel(c)}`
-                        : `Excluir ${channelLabel(c)} — indisponível enquanto o serviço do WhatsApp não estiver ativo`
+                        ? `Desconectar ${channelLabel(c)}`
+                        : `Desconectar ${channelLabel(c)} — indisponível enquanto o serviço do WhatsApp não estiver ativo`
                     }
                     onClick={() => setToDelete(c)}
                   >
                     <Trash size={14} aria-hidden />
+                    Desconectar
                   </Button>
                 </div>
               </Card>
@@ -488,7 +489,7 @@ function ExcluirCanalDialog({
     <Dialog open onOpenChange={(o) => !o && !excluindo && onCancel()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Excluir {channelLabel(canal)}?</DialogTitle>
+          <DialogTitle>Desconectar e Excluir {channelLabel(canal)}?</DialogTitle>
           <DialogDescription asChild>
             <div className="space-y-2">
               <p>O número será desconectado do WhatsApp e sai desta lista.</p>
@@ -524,7 +525,7 @@ function ExcluirCanalDialog({
             ) : (
               <Trash size={14} aria-hidden />
             )}
-            Excluir
+            Desconectar
           </Button>
         </div>
       </DialogContent>

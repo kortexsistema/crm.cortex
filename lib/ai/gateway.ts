@@ -23,8 +23,10 @@ import { env } from "@/lib/env";
 export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 
 export type ModelId =
-  | "google/gemini-1.5-flash"
-  | "google/gemini-1.5-pro"
+  | "google/gemini-3.6-flash"
+  | "google/gemini-3.5-flash"
+  | "google/gemini-2.5-flash"
+  | "google/gemini-3.1-pro"
   | "anthropic/claude-sonnet-5"
   | "anthropic/claude-opus-5"
   | "anthropic/claude-haiku-4-5"
@@ -32,8 +34,8 @@ export type ModelId =
   // Allow arbitrary tenant-configured strings without losing autocomplete on the canonical ones.
   | (string & {});
 
-export const DEFAULT_BOT_MODEL: ModelId = "google/gemini-1.5-flash";
-export const DEFAULT_CLASSIFIER_MODEL: ModelId = "google/gemini-1.5-flash";
+export const DEFAULT_BOT_MODEL: ModelId = "google/gemini-3.5-flash";
+export const DEFAULT_CLASSIFIER_MODEL: ModelId = "google/gemini-3.5-flash";
 export const DEFAULT_EMBEDDING_MODEL: ModelId = "openai/text-embedding-3-small";
 
 export function isAiGatewayConfigured(): boolean {

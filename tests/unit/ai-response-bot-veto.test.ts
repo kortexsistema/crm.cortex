@@ -20,7 +20,7 @@ vi.mock("@/lib/logger", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
 }));
 vi.mock("@/lib/ai/gateway", () => ({
-  DEFAULT_BOT_MODEL: "anthropic/claude-sonnet-4-6",
+  getDefaultChatModel: vi.fn(async () => "anthropic/claude-sonnet-4-6"),
   gatewayConfig: {},
   gatewayHeaders: () => ({}),
   isAiGatewayConfigured: () => true,

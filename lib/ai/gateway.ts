@@ -35,8 +35,14 @@ export type ModelId =
   // Allow arbitrary tenant-configured strings without losing autocomplete on the canonical ones.
   | (string & {});
 
-export const DEFAULT_BOT_MODEL: ModelId = "google/gemini-3.5-flash";
-export const DEFAULT_CLASSIFIER_MODEL: ModelId = "google/gemini-3.5-flash";
+export async function getDefaultChatModel(): Promise<ModelId> {
+  const model = await loadPlatformSetting("DEFAULT_CHAT_MODEL");
+  if (model) {
+    return model as ModelId;
+  }
+  return "google/gemini-3.5-flash";
+}
+
 export const DEFAULT_EMBEDDING_MODEL: ModelId = "openai/text-embedding-3-small";
 
 export async function isAiGatewayConfigured(): Promise<boolean> {

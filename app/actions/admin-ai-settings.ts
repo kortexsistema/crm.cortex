@@ -92,3 +92,48 @@ export async function grantTenantTokens(tenantId: string, amount: number) {
 
   return { ok: true };
 }
+
+export async function saveGlobalModelSetting(modelId: string) {
+  const { user } = await requirePlatformAdmin();
+  const admin = createAdminClient();
+
+  if (!modelId || modelId.trim() === "") {
+    return { ok: false, error: "O modelo não pode estar vazio." };
+  }
+
+  const secret = encryptKey(modelId.trim());
+
+  // Convert buffers to PostgREST format '\xHEX'
+  const valueEncrypted = bufToBytea(secret.ciphertext);
+  const valueIv = bufToBytea(secret.iv);
+  const valueTag = bufToBytea(secret.tag);
+
+  const { error } = await admin
+    .from("platform_settings")
+    .upsert(
+      {
+        id: "DEFAULT_CHAT_MODEL",
+        value_encrypted: valueEncrypted,
+        value_iv: valueIv,
+        value_tag: valueTag,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "id" }
+    );
+
+  if (error) {
+    return { ok: false, error: "Falha ao salvar modelo global: " + error.message };
+  }
+
+  await audit({
+    organizationId: user.id,
+    actorUserId: user.id,
+    action: "platform.settings.ai_key_updated",
+    resourceType: "platform_settings",
+    resourceId: "DEFAULT_CHAT_MODEL",
+    metadata: { modelId },
+    actingAsPlatformAdmin: true,
+  });
+
+  return { ok: true };
+}

@@ -12,6 +12,7 @@ import {
   Users,
   ShieldCheck,
   ArrowRight,
+  Brain,
 } from "@/lib/ui/icons";
 import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
@@ -33,6 +34,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/admin/usage", label: "Usage", icon: ChartBar },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/platform-admins", label: "Platform Admins", icon: ShieldCheck },
+  { href: "/admin/settings/ai", label: "Config de IA", icon: Brain },
 ];
 
 interface AdminSidebarProps {

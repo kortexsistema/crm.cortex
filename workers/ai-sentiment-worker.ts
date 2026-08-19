@@ -17,13 +17,13 @@ import { generateObject } from "ai";
 import { z } from "zod";
 
 import { computeCost } from "@/lib/ai/cost";
-import { DEFAULT_CLASSIFIER_MODEL, isAiGatewayConfigured, resolveLanguageModel } from "@/lib/ai/gateway";
+import { getDefaultChatModel, isAiGatewayConfigured, resolveLanguageModel } from "@/lib/ai/gateway";
 import { logInvocation } from "@/lib/ai/log-invocation";
 import { SENTIMENT_SYSTEM_PROMPT } from "@/lib/ai/prompts/sentiment";
 import type { EventRow } from "@/lib/event-log/dispatcher";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-const SENTIMENT_MODEL = DEFAULT_CLASSIFIER_MODEL; // "anthropic/claude-haiku-4-5"
+// SENTIMENT_MODEL is now fetched dynamically from getDefaultChatModel()
 const DEFAULT_SENTIMENT_THRESHOLD = 0.3;
 const CLASSIFY_TIMEOUT_MS = 5_000;
 
@@ -70,7 +70,8 @@ export async function processSentiment(event: EventRow): Promise<SentimentResult
     // AI_GATEWAY_API_KEY" — o que quebrava este worker em toda instalação que
     // só tem ANTHROPIC_API_KEY, ou seja, o padrão do install.sh. O resolver
     // devolve o provider certo para a chave que existir.
-    const sentimentModel = await resolveLanguageModel(SENTIMENT_MODEL);
+    const sentimentModelId = await getDefaultChatModel();
+    const sentimentModel = await resolveLanguageModel(sentimentModelId);
     if (!sentimentModel) {
       return { skipped: true, reason: "ai_gateway_key_missing" };
     }
@@ -201,12 +202,12 @@ export async function processSentiment(event: EventRow): Promise<SentimentResult
       conversation_id: conversationId ?? message.conversation_id ?? null,
       message_id: messageId,
       invocation_kind: "sentiment_classify",
-      model: SENTIMENT_MODEL,
+      model: sentimentModelId,
       prompt_tokens: promptTokens,
       completion_tokens: completionTokens,
       latency_ms: latencyMs,
       cost_cents: await computeCost({
-        model: SENTIMENT_MODEL,
+        model: sentimentModelId,
         promptTokens,
         completionTokens,
       }),

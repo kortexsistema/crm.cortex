@@ -422,6 +422,7 @@ export const NAV_DESTINATIONS: NavDestination[] = [
     group: "organizacao",
     section: "Sua empresa",
     minRole: "admin",
+    sidebar: true,
   },
   {
     href: "/app/lgpd/requests",

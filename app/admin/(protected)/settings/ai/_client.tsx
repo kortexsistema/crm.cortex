@@ -4,15 +4,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { saveGlobalAIKey } from "@/app/actions/admin-ai-settings";
+import { saveGlobalAIKey, saveGlobalModelSetting } from "@/app/actions/admin-ai-settings";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function AdminAIClient() {
   const [geminiKey, setGeminiKey] = useState("");
   const [anthropicKey, setAnthropicKey] = useState("");
   const [openaiKey, setOpenaiKey] = useState("");
+  const [defaultModel, setDefaultModel] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isSavingModel, setIsSavingModel] = useState(false);
 
   async function handleSave(provider: string, key: string) {
     if (!key) {
@@ -33,6 +42,22 @@ export function AdminAIClient() {
     }
   }
 
+  async function handleSaveModel() {
+    if (!defaultModel) {
+      toast.error("Por favor, selecione um modelo.");
+      return;
+    }
+    setIsSavingModel(true);
+    const res = await saveGlobalModelSetting(defaultModel);
+    setIsSavingModel(false);
+    
+    if (res.ok) {
+      toast.success("Modelo padrão atualizado com sucesso!");
+    } else {
+      toast.error(res.error || "Erro ao salvar o modelo.");
+    }
+  }
+
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
@@ -41,6 +66,39 @@ export function AdminAIClient() {
           Configure as credenciais fallback da plataforma. Estas chaves serão utilizadas pelos agentes caso o tenant não tenha configurado uma chave própria.
         </p>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Modelo Padrão (Bot e Classificação)</CardTitle>
+          <CardDescription>
+            Escolha qual modelo de IA será utilizado por padrão para conversar e analisar sentimentos.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <Label htmlFor="model-select">Modelo Base</Label>
+            <Select value={defaultModel} onValueChange={setDefaultModel}>
+              <SelectTrigger id="model-select">
+                <SelectValue placeholder="Selecione um modelo..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="google/gemini-3.5-flash">Gemini 1.5 Flash</SelectItem>
+                <SelectItem value="google/gemini-3.1-pro">Gemini 1.5 Pro</SelectItem>
+                <SelectItem value="anthropic/claude-sonnet-5">Claude 3.5 Sonnet</SelectItem>
+                <SelectItem value="anthropic/claude-haiku-4-5">Claude 3.5 Haiku</SelectItem>
+                <SelectItem value="openai/gpt-4o">GPT-4o</SelectItem>
+                <SelectItem value="openai/gpt-4o-mini">GPT-4o Mini</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button disabled={isSavingModel || !defaultModel} onClick={handleSaveModel}>
+            {isSavingModel ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Salvar Modelo
+          </Button>
+        </CardFooter>
+      </Card>
 
       <Card>
         <CardHeader>

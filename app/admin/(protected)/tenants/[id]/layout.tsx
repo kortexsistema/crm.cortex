@@ -41,6 +41,7 @@ interface TabItem {
 const TABS: TabItem[] = [
   { label: "Visão Geral", href: "", disabled: false },
   { label: "Saúde", href: "/health", disabled: false },
+  { label: "Faturamento", href: "/billing", disabled: false },
   { label: "Equipe", href: "/team", disabled: true },
   { label: "Uso", href: "/usage", disabled: true },
 ];

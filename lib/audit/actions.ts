@@ -220,4 +220,7 @@ export type AuditAction =
   | "followup.cancelled"
   | "lead.reactivation_proposed"
   | "playbook.domain_updated"
-  | "platform_admin.tenant_updated";
+  | "platform_admin.tenant_updated"
+  | "platform.settings.ai_key_updated"
+  | "platform.tenant.tokens_granted"
+  | "tenant.tokens_extra.requested";

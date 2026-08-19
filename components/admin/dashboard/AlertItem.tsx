@@ -10,6 +10,7 @@ const KIND_ICONS: Record<AlertKind, ElementType> = {
   lgpd_at_risk: Scales,
   ai_budget: ChartBar,
   tenant_pending_overflow: Clock,
+  token_extra_request: Warning,
 };
 
 const KIND_LABELS: Record<AlertKind, string> = {
@@ -17,6 +18,7 @@ const KIND_LABELS: Record<AlertKind, string> = {
   lgpd_at_risk: "LGPD",
   ai_budget: "IA Budget",
   tenant_pending_overflow: "Overflow",
+  token_extra_request: "Tokens Extras",
 };
 
 interface AlertItemProps {

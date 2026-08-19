@@ -70,7 +70,7 @@ export async function processSentiment(event: EventRow): Promise<SentimentResult
     // AI_GATEWAY_API_KEY" — o que quebrava este worker em toda instalação que
     // só tem ANTHROPIC_API_KEY, ou seja, o padrão do install.sh. O resolver
     // devolve o provider certo para a chave que existir.
-    const sentimentModel = resolveLanguageModel(SENTIMENT_MODEL);
+    const sentimentModel = await resolveLanguageModel(SENTIMENT_MODEL);
     if (!sentimentModel) {
       return { skipped: true, reason: "ai_gateway_key_missing" };
     }

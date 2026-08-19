@@ -37,7 +37,7 @@ export async function embedText(
     throw new Error("embed_unavailable: no AI_GATEWAY_API_KEY or OPENAI_API_KEY configured");
   }
   const model = opts.model ?? DEFAULT_EMBEDDING_MODEL;
-  const cfg = gatewayConfig();
+  const cfg = await gatewayConfig();
 
   // COM gateway: a string `openai/text-embedding-3-small` é roteada por ele, que
   // lê `AI_GATEWAY_API_KEY` do process.env. Headers vão junto p/ observabilidade

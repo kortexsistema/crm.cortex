@@ -8,7 +8,8 @@ export type AlertKind =
   | "waha_ban"
   | "lgpd_at_risk"
   | "ai_budget"
-  | "tenant_pending_overflow";
+  | "tenant_pending_overflow"
+  | "token_extra_request";
 
 export interface AlertItem {
   id: string;
@@ -109,6 +110,7 @@ export async function GET(_req: NextRequest) {
     lgpdAlertsRes,
     aiBudgetAlertsRes,
     overflowAlertsRes,
+    tokenRequestsRes,
   ] = await Promise.all([
     // WAHA ban alerts with org name
     admin
@@ -163,6 +165,13 @@ export async function GET(_req: NextRequest) {
       .select("organization_id, organizations!inner(display_name)")
       .eq("status", "pending")
       .limit(2000),
+
+    // Tokens extra requests
+    admin
+      .from("organizations")
+      .select("id, display_name, updated_at")
+      .eq("tokens_extra_status", "requested")
+      .limit(20),
   ]);
 
   const alerts: AlertItem[] = [];
@@ -247,6 +256,20 @@ export async function GET(_req: NextRequest) {
         created_at: new Date().toISOString(),
       });
     }
+  }
+
+  // Token requests alerts
+  for (const row of tokenRequestsRes.data ?? []) {
+    alerts.push({
+      id: `token-req-${row.id}`,
+      severity: "warning",
+      kind: "token_extra_request",
+      tenant_id: row.id,
+      tenant_name: row.display_name,
+      message: `Tenant solicitou pacote extra de tokens`,
+      link: `/admin/tenants/${row.id}/billing`,
+      created_at: row.updated_at,
+    });
   }
 
   // Sort: critical first, then by created_at desc

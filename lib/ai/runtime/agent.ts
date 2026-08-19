@@ -231,13 +231,23 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
       return await failRun(run, "version_not_found", "agent version missing", startedAt);
     }
 
-    const { data: agentRaw } = await admin
+    const { data: agentData, error: agentErr } = await admin
       .from("ai_agents")
       .select("id, organization_id, created_by")
       .eq("id", run.agent_id)
       .eq("organization_id", run.organization_id)
       .maybeSingle();
-    const agent = agentRaw as AgentRow | null;
+
+    const { data: orgData, error: orgErr } = await admin
+      .from("organizations")
+      .select("tokens_balance")
+      .eq("id", run.organization_id)
+      .maybeSingle();
+
+    if (agentErr || orgErr) {
+      return await failRun(run, "data_fetch_failed", "failed to fetch agent/org metadata", startedAt);
+    }
+    const agent = agentData as AgentRow | null;
 
     // 4) Load credential. Plaintext lives only in this scope.
     let credentialApiKey: string | undefined;
@@ -397,7 +407,7 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
     if (credentialApiKey) {
       model = buildModel(version.provider, credentialApiKey, version.model);
     } else {
-      const resolvedModel = resolveLanguageModel(version.model as ModelId);
+      const resolvedModel = await resolveLanguageModel(version.model as ModelId);
       if (!resolvedModel) {
         return await failRun(run, "gateway_unconfigured", "global platform AI gateway not configured", startedAt);
       }
@@ -409,6 +419,10 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
     const budgetGuard: StopCondition<ToolSet> = async ({ steps }) => {
       if (handoffSignal.triggered) {
         abortReason = "handoff_tool";
+        return true;
+      }
+      if (orgData && orgData.tokens_balance <= 0) {
+        abortReason = "tenant_out_of_tokens";
         return true;
       }
       const usage = totalUsage(steps as Array<{ usage?: { inputTokens?: number; outputTokens?: number } }>);
@@ -453,6 +467,14 @@ export async function runAgent(input: RunAgentInput): Promise<RunAgentResult> {
       outputTokens: usage.outputTokens,
     });
     const latencyMs = Date.now() - startedAt;
+
+    const totalUsageTokens = usage.inputTokens + usage.outputTokens;
+    if (totalUsageTokens > 0) {
+      await admin.rpc("decrement_tenant_tokens", {
+        org_id: run.organization_id,
+        amount: totalUsageTokens,
+      });
+    }
     const trace = serializeSteps(result.steps as never);
 
     // 13) Handoff via tool call?

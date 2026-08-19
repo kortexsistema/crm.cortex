@@ -141,7 +141,7 @@ export async function processMessageReceived(row: EventRow): Promise<ProcessResu
   //
   // Skip, não erro: modelo que nenhuma chave desta instalação atende é config,
   // não falha transitória — retentar só repetiria o loop que este PR mata.
-  const model = resolveLanguageModel(ctx.agent.model);
+  const model = await resolveLanguageModel(ctx.agent.model);
   if (!model) {
     logger.warn("[ai-response-worker] modelo do agente sem provider configurado", {
       organization_id: ctx.organization_id,
@@ -543,7 +543,7 @@ async function retrieveContext(input: RetrieveInput): Promise<RagHit[]> {
 // o custo e para a auditoria em ai_invocations; o que executa é o provider.
 async function invokeBot(ctx: BotContext, model: LanguageModel): Promise<BotResponse> {
   const renderedSystem = renderSystemPrompt(ctx.agent.system_prompt, ctx);
-  const cfg = gatewayConfig();
+  const cfg = await gatewayConfig();
   const headers = cfg ? gatewayHeaders({ organizationId: ctx.organization_id }) : undefined;
 
   // Build a chronological multi-turn message history. The most recent inbound

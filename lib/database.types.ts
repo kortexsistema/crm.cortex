@@ -4324,6 +4324,9 @@ export type Database = {
           slug: string
           status: string
           suspended_at: string | null
+          tokens_balance: number
+          tokens_cycle_end_at: string | null
+          tokens_extra_status: string
           suspended_by: string | null
           suspended_reason: string | null
           timezone: string
@@ -4349,6 +4352,9 @@ export type Database = {
           slug: string
           status?: string
           suspended_at?: string | null
+          tokens_balance?: number
+          tokens_cycle_end_at?: string | null
+          tokens_extra_status?: string
           suspended_by?: string | null
           suspended_reason?: string | null
           timezone?: string
@@ -4374,6 +4380,9 @@ export type Database = {
           slug?: string
           status?: string
           suspended_at?: string | null
+          tokens_balance?: number
+          tokens_cycle_end_at?: string | null
+          tokens_extra_status?: string
           suspended_by?: string | null
           suspended_reason?: string | null
           timezone?: string

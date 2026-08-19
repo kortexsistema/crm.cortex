@@ -67,7 +67,7 @@ describe("destino real de cada caminho de resolveLanguageModel", () => {
     // string — é justamente esse acoplamento implícito que originou o bug.
     process.env.AI_GATEWAY_API_KEY = "gw-key";
 
-    const model = resolveLanguageModel(MODELO);
+    const model = await resolveLanguageModel(MODELO);
     expect(model).not.toBeNull();
     expect(await destinoDe(model!)).toContain("ai-gateway.vercel.sh");
   });
@@ -77,7 +77,7 @@ describe("destino real de cada caminho de resolveLanguageModel", () => {
     // Chave da Anthropic presente de propósito: a precedência tem que valer.
     envMock.ANTHROPIC_API_KEY = "sk-ant-xxx";
 
-    const model = resolveLanguageModel(MODELO);
+    const model = await resolveLanguageModel(MODELO);
     expect(model).not.toBeNull();
     const hosts = await destinoDe(model!);
     expect(hosts).toContain("openrouter.ai");
@@ -87,7 +87,7 @@ describe("destino real de cada caminho de resolveLanguageModel", () => {
   it("provider direto → a requisição vai para a Anthropic", async () => {
     envMock.ANTHROPIC_API_KEY = "sk-ant-xxx";
 
-    const model = resolveLanguageModel(MODELO);
+    const model = await resolveLanguageModel(MODELO);
     expect(model).not.toBeNull();
     expect(await destinoDe(model!)).toContain("api.anthropic.com");
   });
@@ -101,7 +101,7 @@ describe("destino real de cada caminho de resolveLanguageModel", () => {
     process.env.AI_GATEWAY_API_KEY = "gw-key";
     envMock.OPENROUTER_API_KEY = "sk-or-xxx";
 
-    const model = resolveLanguageModel(MODELO);
+    const model = await resolveLanguageModel(MODELO);
     expect(model).not.toBeNull();
     const hosts = await destinoDe(model!);
     expect(hosts).toContain("ai-gateway.vercel.sh");
@@ -112,7 +112,7 @@ describe("destino real de cada caminho de resolveLanguageModel", () => {
     envMock.OPENROUTER_API_KEY = "sk-or-xxx";
     envMock.OPENROUTER_BASE_URL = "https://meu-proxy.example.com/v1";
 
-    const model = resolveLanguageModel(MODELO);
+    const model = await resolveLanguageModel(MODELO);
     expect(model).not.toBeNull();
     expect(await destinoDe(model!)).toContain("meu-proxy.example.com");
   });

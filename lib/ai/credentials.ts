@@ -99,3 +99,25 @@ export async function loadCredential(
 
   return { apiKey, provider: data.provider, label: data.label };
 }
+
+export async function loadPlatformSetting(key: string): Promise<string | null> {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("platform_settings")
+    .select("value_encrypted, value_iv, value_tag")
+    .eq("id", key)
+    .maybeSingle();
+
+  if (error || !data) return null;
+
+  try {
+    return decryptKey({
+      ciphertext: byteaToBuffer(data.value_encrypted),
+      iv: byteaToBuffer(data.value_iv),
+      tag: byteaToBuffer(data.value_tag),
+    });
+  } catch (err) {
+    return null;
+  }
+}
+

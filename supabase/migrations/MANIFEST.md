@@ -174,3 +174,4 @@ To re-apply on a fresh Supabase project, replay the migrations in version order 
 | `20260818175000` | `0120_ai_agent_default_gemini` | Altera o valor padrão da coluna model em ai_agents para google/gemini-1.5-flash, tornando o Gemini a IA padrão do sistema em vez do Anthropic. Idempotente (apenas altera o schema default). |
 | `20260819074500` | `0121_update_gemini_models` | Adiciona as novas versões do Gemini e altera o valor padrão da coluna model em ai_agents para google/gemini-3.5-flash. |
 20260819115500_0122_agent_optional_credential.sql
+20260819120000_0123_add_tenant_tokens_and_platform_settings.sql

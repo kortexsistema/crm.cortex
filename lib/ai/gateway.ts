@@ -17,6 +17,7 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import type { LanguageModel } from "ai";
 
 import { env } from "@/lib/env";
+import { loadPlatformSetting } from "./credentials";
 
 /** Endpoint da OpenRouter. Compatível com a API da OpenAI, então o provider
  *  `@ai-sdk/openai` fala com ela sem dependência nova. */
@@ -38,13 +39,16 @@ export const DEFAULT_BOT_MODEL: ModelId = "google/gemini-3.5-flash";
 export const DEFAULT_CLASSIFIER_MODEL: ModelId = "google/gemini-3.5-flash";
 export const DEFAULT_EMBEDDING_MODEL: ModelId = "openai/text-embedding-3-small";
 
-export function isAiGatewayConfigured(): boolean {
+export async function isAiGatewayConfigured(): Promise<boolean> {
   return (
     Boolean(env.AI_GATEWAY_API_KEY) ||
     Boolean(env.OPENROUTER_API_KEY) ||
     Boolean(env.GEMINI_API_KEY) ||
     Boolean(env.ANTHROPIC_API_KEY) ||
-    Boolean(env.GOOGLE_GENERATIVE_AI_API_KEY)
+    Boolean(env.GOOGLE_GENERATIVE_AI_API_KEY) ||
+    Boolean(await loadPlatformSetting("GEMINI_API_KEY")) ||
+    Boolean(await loadPlatformSetting("ANTHROPIC_API_KEY")) ||
+    Boolean(await loadPlatformSetting("OPENAI_API_KEY"))
   );
 }
 
@@ -73,30 +77,34 @@ export function isAiGatewayConfigured(): boolean {
  * Devolve null quando nada está configurado, para o chamador PULAR com motivo
  * claro em vez de estourar com erro de rede lá dentro.
  */
-export function resolveLanguageModel(model: ModelId): LanguageModel | null {
+export async function resolveLanguageModel(model: ModelId): Promise<LanguageModel | null> {
   const id = String(model);
 
-  if (gatewayConfig()) return id as LanguageModel;
+  const gatewayCfg = await gatewayConfig();
+  if (gatewayCfg) return id as LanguageModel;
 
-  if (env.OPENROUTER_API_KEY) {
+  const openRouterKey = env.OPENROUTER_API_KEY || await loadPlatformSetting("OPENROUTER_API_KEY");
+  if (openRouterKey) {
     return createOpenAI({
-      apiKey: env.OPENROUTER_API_KEY,
+      apiKey: openRouterKey,
       baseURL: env.OPENROUTER_BASE_URL || OPENROUTER_BASE_URL,
     })(id);
   }
 
-  if (id.startsWith("anthropic/") && env.ANTHROPIC_API_KEY) {
-    return createAnthropic({ apiKey: env.ANTHROPIC_API_KEY })(
+  const anthropicKey = env.ANTHROPIC_API_KEY || await loadPlatformSetting("ANTHROPIC_API_KEY");
+  if (id.startsWith("anthropic/") && anthropicKey) {
+    return createAnthropic({ apiKey: anthropicKey })(
       id.slice("anthropic/".length),
     );
   }
 
-  if (id.startsWith("openai/") && env.OPENAI_API_KEY) {
-    return createOpenAI({ apiKey: env.OPENAI_API_KEY })(id.slice("openai/".length));
+  const openAiKey = env.OPENAI_API_KEY || await loadPlatformSetting("OPENAI_API_KEY");
+  if (id.startsWith("openai/") && openAiKey) {
+    return createOpenAI({ apiKey: openAiKey })(id.slice("openai/".length));
   }
 
   if (id.startsWith("google/")) {
-    const geminiKey = env.GEMINI_API_KEY || env.GOOGLE_GENERATIVE_AI_API_KEY;
+    const geminiKey = env.GEMINI_API_KEY || env.GOOGLE_GENERATIVE_AI_API_KEY || await loadPlatformSetting("GEMINI_API_KEY");
     if (geminiKey) {
       return createGoogleGenerativeAI({ apiKey: geminiKey })(
         id.slice("google/".length),
@@ -131,10 +139,11 @@ export function gatewayHeaders(opts: { organizationId: string }): Record<string,
  * with a clear skip reason, and so future explicit `createGateway()` callers
  * have the canonical place to read config.
  */
-export function gatewayConfig(): { apiKey: string; baseURL?: string } | null {
-  if (!env.AI_GATEWAY_API_KEY) return null;
+export async function gatewayConfig(): Promise<{ apiKey: string; baseURL?: string } | null> {
+  const gatewayKey = env.AI_GATEWAY_API_KEY || await loadPlatformSetting("AI_GATEWAY_API_KEY");
+  if (!gatewayKey) return null;
   return {
-    apiKey: env.AI_GATEWAY_API_KEY,
+    apiKey: gatewayKey,
     baseURL: env.AI_GATEWAY_BASE_URL || undefined,
   };
 }

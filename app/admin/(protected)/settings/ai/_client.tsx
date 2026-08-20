@@ -13,12 +13,15 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
+  SelectLabel,
 } from "@/components/ui/select";
 
 export function AdminAIClient({ initialDefaultModel = "" }: { initialDefaultModel?: string }) {
   const [geminiKey, setGeminiKey] = useState("");
   const [anthropicKey, setAnthropicKey] = useState("");
   const [openaiKey, setOpenaiKey] = useState("");
+  const [openrouterKey, setOpenrouterKey] = useState("");
   const [defaultModel, setDefaultModel] = useState(initialDefaultModel);
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingModel, setIsSavingModel] = useState(false);
@@ -37,6 +40,7 @@ export function AdminAIClient({ initialDefaultModel = "" }: { initialDefaultMode
       if (provider === "google") setGeminiKey("");
       else if (provider === "anthropic") setAnthropicKey("");
       else if (provider === "openai") setOpenaiKey("");
+      else if (provider === "openrouter") setOpenrouterKey("");
     } else {
       toast.error(res.error || "Erro ao salvar a chave.");
     }
@@ -82,13 +86,41 @@ export function AdminAIClient({ initialDefaultModel = "" }: { initialDefaultMode
                 <SelectValue placeholder="Selecione um modelo..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="google/gemini-3.5-flash">Gemini 1.5 Flash</SelectItem>
-                <SelectItem value="google/gemini-3.1-pro">Gemini 1.5 Pro</SelectItem>
-                <SelectItem value="google/gemini-2.0-flash">Gemini 2.0 Flash</SelectItem>
-                <SelectItem value="anthropic/claude-sonnet-5">Claude 3.5 Sonnet</SelectItem>
-                <SelectItem value="anthropic/claude-haiku-4-5">Claude 3.5 Haiku</SelectItem>
-                <SelectItem value="openai/gpt-4o">GPT-4o</SelectItem>
-                <SelectItem value="openai/gpt-4o-mini">GPT-4o Mini</SelectItem>
+                <SelectGroup>
+                  <SelectLabel>Gratuitos para Testes (OpenRouter)</SelectLabel>
+                  <SelectItem value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B Instruct</SelectItem>
+                  <SelectItem value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash (Exp)</SelectItem>
+                  <SelectItem value="google/gemini-2.0-pro-exp-02-05:free">Gemini 2.0 Pro (Exp)</SelectItem>
+                </SelectGroup>
+                <SelectGroup>
+                  <SelectLabel>Atendimento Humanizado</SelectLabel>
+                  <SelectItem value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</SelectItem>
+                  <SelectItem value="anthropic/claude-3-5-haiku-20241022">Claude 3.5 Haiku</SelectItem>
+                  <SelectItem value="openai/gpt-4o">GPT-4o</SelectItem>
+                  <SelectItem value="openai/gpt-4o-mini">GPT-4o Mini</SelectItem>
+                </SelectGroup>
+                <SelectGroup>
+                  <SelectLabel>Google Gemini</SelectLabel>
+                  <SelectItem value="google/gemini-1.5-pro">Gemini 1.5 Pro</SelectItem>
+                  <SelectItem value="google/gemini-1.5-flash">Gemini 1.5 Flash</SelectItem>
+                  <SelectItem value="google/gemini-2.0-flash-001">Gemini 2.0 Flash</SelectItem>
+                  <SelectItem value="google/gemini-2.0-pro-exp-02-05">Gemini 2.0 Pro (Exp)</SelectItem>
+                </SelectGroup>
+                <SelectGroup>
+                  <SelectLabel>Outros Provedores</SelectLabel>
+                  <SelectItem value="deepseek/deepseek-chat">DeepSeek Chat</SelectItem>
+                  <SelectItem value="deepseek/deepseek-r1">DeepSeek R1</SelectItem>
+                  <SelectItem value="meta-llama/llama-3.3-70b-instruct">Llama 3.3 70B</SelectItem>
+                  <SelectItem value="qwen/qwen-2.5-72b-instruct">Qwen 2.5 72B</SelectItem>
+                </SelectGroup>
+                <SelectGroup>
+                  <SelectLabel>Compatibilidade Legada</SelectLabel>
+                  <SelectItem value="google/gemini-3.5-flash">Gemini 1.5 Flash (Legacy)</SelectItem>
+                  <SelectItem value="google/gemini-3.1-pro">Gemini 1.5 Pro (Legacy)</SelectItem>
+                  <SelectItem value="google/gemini-2.0-flash">Gemini 2.0 Flash (Legacy)</SelectItem>
+                  <SelectItem value="anthropic/claude-sonnet-5">Claude 3.5 Sonnet (Legacy)</SelectItem>
+                  <SelectItem value="anthropic/claude-haiku-4-5">Claude 3.5 Haiku (Legacy)</SelectItem>
+                </SelectGroup>
               </SelectContent>
             </Select>
           </div>
@@ -172,6 +204,30 @@ export function AdminAIClient({ initialDefaultModel = "" }: { initialDefaultMode
           <Button disabled={isSaving} onClick={() => handleSave("openai", openaiKey)}>
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Salvar Chave OpenAI
+          </Button>
+        </CardFooter>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>OpenRouter</CardTitle>
+          <CardDescription>Chave de API Mestra do OpenRouter para roteamento universal.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <Label htmlFor="openrouter">API Key</Label>
+            <Input 
+              id="openrouter" 
+              type="password" 
+              placeholder="sk-or-v1-..." 
+              value={openrouterKey}
+              onChange={(e) => setOpenrouterKey(e.target.value)}
+            />
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button disabled={isSaving} onClick={() => handleSave("openrouter", openrouterKey)}>
+            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Salvar Chave OpenRouter
           </Button>
         </CardFooter>
       </Card>

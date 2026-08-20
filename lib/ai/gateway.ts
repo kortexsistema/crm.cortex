@@ -25,6 +25,28 @@ import { logger } from "@/lib/logger";
 export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 
 export type ModelId =
+  // Atendimento Humanizado (Claude/GPT)
+  | "anthropic/claude-3.5-sonnet"
+  | "anthropic/claude-3.5-sonnet:beta"
+  | "anthropic/claude-3-5-haiku-20241022"
+  | "openai/gpt-4o"
+  | "openai/gpt-4o-mini"
+  // Google Gemini
+  | "google/gemini-1.5-pro"
+  | "google/gemini-1.5-flash"
+  | "google/gemini-2.0-flash-001"
+  | "google/gemini-2.0-pro-exp-02-05"
+  // Gratuitos para Testes (OpenRouter)
+  | "meta-llama/llama-3.3-70b-instruct:free"
+  | "google/gemini-2.0-flash-exp:free"
+  | "google/gemini-2.0-pro-exp-02-05:free"
+  // Outros Provedores
+  | "deepseek/deepseek-chat"
+  | "deepseek/deepseek-r1"
+  | "meta-llama/llama-3.3-70b-instruct"
+  | "qwen/qwen-2.5-72b-instruct"
+  | "openai/text-embedding-3-small"
+  // Compatibilidade Legada
   | "google/gemini-3.6-flash"
   | "google/gemini-3.5-flash"
   | "google/gemini-2.5-flash"
@@ -33,9 +55,6 @@ export type ModelId =
   | "anthropic/claude-sonnet-5"
   | "anthropic/claude-opus-5"
   | "anthropic/claude-haiku-4-5"
-  | "openai/gpt-4o"
-  | "openai/gpt-4o-mini"
-  | "openai/text-embedding-3-small"
   // Allow arbitrary tenant-configured strings without losing autocomplete on the canonical ones.
   | (string & {});
 
@@ -44,7 +63,7 @@ export async function getDefaultChatModel(): Promise<ModelId> {
   if (model) {
     return model as ModelId;
   }
-  return "google/gemini-3.5-flash";
+  return "google/gemini-2.0-flash-exp:free";
 }
 
 export const DEFAULT_EMBEDDING_MODEL: ModelId = "openai/text-embedding-3-small";
@@ -98,6 +117,10 @@ export async function resolveLanguageModel(model: ModelId): Promise<LanguageMode
     return createOpenAI({
       apiKey: openRouterKey,
       baseURL: env.OPENROUTER_BASE_URL || OPENROUTER_BASE_URL,
+      headers: {
+        "HTTP-Referer": env.NEXT_PUBLIC_APP_URL || "https://crmkortex.pro",
+        "X-Title": "Kortex CRM",
+      },
     })(id);
   }
 

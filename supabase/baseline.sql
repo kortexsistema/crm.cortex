@@ -8914,7 +8914,27 @@ values
   ('google',    'gemini-3.5-flash',  'Gemini 3.5 Flash',     null, 150, 900, true),
   ('google',    'gemini-2.5-flash-lite', 'Gemini 2.5 Flash-Lite',
    'O mais barato da linha Gemini.', 10, 40, true),
-  ('google',    'gemini-2.0-flash',  'Gemini 2.0 Flash',     null, 10, 40, true)
+  ('google',    'gemini-2.0-flash',  'Gemini 2.0 Flash',     null, 10, 40, true),
+  -- Atendimento Humanizado (Claude/GPT)
+  ('openrouter', 'anthropic/claude-3.5-sonnet', 'Claude 3.5 Sonnet', 'Inteligência de ponta para interações humanizadas complexas', 300, 1500, true),
+  ('openrouter', 'anthropic/claude-3.5-sonnet:beta', 'Claude 3.5 Sonnet (Beta)', 'Acesso antecipado aos novos recursos do Sonnet', 300, 1500, true),
+  ('openrouter', 'anthropic/claude-3-5-haiku-20241022', 'Claude 3.5 Haiku', 'Velocidade e inteligência acessível', 100, 500, true),
+  ('openrouter', 'openai/gpt-4o', 'GPT-4o', 'Modelo flagship da OpenAI, excelente para raciocínio multimodal', 250, 1000, true),
+  ('openrouter', 'openai/gpt-4o-mini', 'GPT-4o Mini', 'Modelo rápido e acessível da OpenAI', 15, 60, true),
+  -- Google Gemini
+  ('openrouter', 'google/gemini-1.5-pro', 'Gemini 1.5 Pro', 'Geração de texto de alta capacidade com grande janela de contexto', 125, 500, true),
+  ('openrouter', 'google/gemini-1.5-flash', 'Gemini 1.5 Flash', 'Alta performance com baixo custo e latência', 10, 40, true),
+  ('openrouter', 'google/gemini-2.0-flash-001', 'Gemini 2.0 Flash', 'A mais nova geração flash do Google', 10, 40, true),
+  ('openrouter', 'google/gemini-2.0-pro-exp-02-05', 'Gemini 2.0 Pro (Exp)', 'Versão experimental do Gemini 2.0 Pro', 200, 800, true),
+  -- Gratuitos para Testes
+  ('openrouter', 'meta-llama/llama-3.3-70b-instruct:free', 'Llama 3.3 70B (Gratuito)', 'Modelo aberto de 70B focado em instruções, gratuito no OpenRouter', 0, 0, true),
+  ('openrouter', 'google/gemini-2.0-flash-exp:free', 'Gemini 2.0 Flash (Gratuito)', 'Versão experimental gratuita do novo modelo flash', 0, 0, true),
+  ('openrouter', 'google/gemini-2.0-pro-exp-02-05:free', 'Gemini 2.0 Pro (Gratuito)', 'Versão experimental gratuita da linha Pro do Google', 0, 0, true),
+  -- Outros Provedores
+  ('openrouter', 'deepseek/deepseek-chat', 'DeepSeek V3', 'Modelo acessível e muito performático de uso geral', 14, 28, true),
+  ('openrouter', 'deepseek/deepseek-r1', 'DeepSeek R1', 'Especialista em raciocínio aberto (o1-like)', 55, 219, true),
+  ('openrouter', 'meta-llama/llama-3.3-70b-instruct', 'Llama 3.3 70B', 'A linha flagship aberta da Meta', 15, 60, true),
+  ('openrouter', 'qwen/qwen-2.5-72b-instruct', 'Qwen 2.5 72B', 'Modelo instrucional de última geração da Alibaba', 40, 40, true)
 on conflict (provider, model_id) do update set
   display_name = excluded.display_name,
   description = excluded.description,
@@ -9297,7 +9317,7 @@ REVOKE ALL ON FUNCTION public.fn_get_user_id_by_email FROM public, anon;
 GRANT EXECUTE ON FUNCTION public.fn_get_user_id_by_email TO service_role;
 
 -- ---- ai_agents_default_gemini (migration 0120) ----
-ALTER TABLE public.ai_agents ALTER COLUMN model SET DEFAULT 'google/gemini-3.5-flash';
+ALTER TABLE public.ai_agents ALTER COLUMN model SET DEFAULT 'meta-llama/llama-3.3-70b-instruct:free';
 
 -- ---- ai_models_gemini_update (migration 0121) ----
 insert into public.ai_models (provider, model_id, display_name, description, input_price_per_million_cents, output_price_per_million_cents, supports_tools)

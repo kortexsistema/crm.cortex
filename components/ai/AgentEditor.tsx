@@ -56,7 +56,7 @@ function buildFormState(agent: AgentRow): FormState {
   const guardrails: GuardrailItem[] = grParsed.success ? grParsed.data : [];
 
   const modelOk = (AGENT_MODELS as readonly string[]).includes(agent.model);
-  const model: AgentModel = (modelOk ? agent.model : "google/gemini-3.5-flash") as AgentModel;
+  const model: AgentModel = (modelOk ? agent.model : "meta-llama/llama-3.3-70b-instruct:free") as AgentModel;
 
   return {
     name: agent.name,

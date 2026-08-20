@@ -9,13 +9,26 @@ import { z } from "zod";
 // ---------------------------------------------------------------------------
 
 export const AGENT_MODELS = [
-  "google/gemini-3.6-flash",
-  "google/gemini-3.5-flash",
-  "google/gemini-2.5-flash",
-  "google/gemini-3.1-pro",
-  "anthropic/claude-sonnet-4-6",
-  "anthropic/claude-haiku-4-5",
-  "anthropic/claude-opus-4-7",
+  // Atendimento Humanizado (Claude/GPT)
+  "anthropic/claude-3.5-sonnet",
+  "anthropic/claude-3.5-sonnet:beta",
+  "anthropic/claude-3-5-haiku-20241022",
+  "openai/gpt-4o",
+  "openai/gpt-4o-mini",
+  // Google Gemini
+  "google/gemini-1.5-pro",
+  "google/gemini-1.5-flash",
+  "google/gemini-2.0-flash-001",
+  "google/gemini-2.0-pro-exp-02-05",
+  // Gratuitos para Testes
+  "meta-llama/llama-3.3-70b-instruct:free",
+  "google/gemini-2.0-flash-exp:free",
+  "google/gemini-2.0-pro-exp-02-05:free",
+  // Outros Provedores
+  "deepseek/deepseek-chat",
+  "deepseek/deepseek-r1",
+  "meta-llama/llama-3.3-70b-instruct",
+  "qwen/qwen-2.5-72b-instruct",
 ] as const;
 
 export const agentModelSchema = z.enum(AGENT_MODELS);

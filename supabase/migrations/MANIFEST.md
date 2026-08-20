@@ -175,3 +175,4 @@ To re-apply on a fresh Supabase project, replay the migrations in version order 
 | `20260819074500` | `0121_update_gemini_models` | Adiciona as novas versões do Gemini e altera o valor padrão da coluna model em ai_agents para google/gemini-3.5-flash. |
 20260819115500_0122_agent_optional_credential.sql
 20260819120000_0123_add_tenant_tokens_and_platform_settings.sql
+| `20260820164000` | `0125_openrouter_models` | Adiciona os novos modelos do OpenRouter, deprecia os antigos, e atualiza agentes para o novo modelo default Llama 3.3 70B (Gratuito). |

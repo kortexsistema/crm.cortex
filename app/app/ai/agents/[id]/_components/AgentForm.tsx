@@ -135,8 +135,8 @@ function buildState(args: {
     name: agent?.name ?? "",
     description: agent?.description ?? "",
     priority: agent?.priority ?? 0,
-    provider: (version?.provider as Provider) ?? "google",
-    model: version?.model || "google/gemini-3.5-flash",
+    provider: (version?.provider as Provider) ?? "openrouter",
+    model: version?.model || "meta-llama/llama-3.3-70b-instruct:free",
     credential_id: version?.credential_id ?? "",
     channel_session_id: version?.channel_session_id ?? "",
     system_prompt:
@@ -209,10 +209,6 @@ export function AgentForm(props: Props) {
     setForm((prev) => ({ ...prev, ...p }));
   }
 
-  // Quando provider muda, limpa credential e modelo (eles dependem do provider).
-  function changeProvider(p: Provider) {
-    patch({ provider: p, credential_id: "", model: "" });
-  }
 
   const cred = findCredential(props.credentials, form.credential_id);
   const credSt = cred ? credentialStatus(cred) : null;
@@ -461,24 +457,6 @@ export function AgentForm(props: Props) {
           {props.isPlatformAdmin && (
             <Card className="space-y-3 p-4">
               <h3 className="text-sm font-medium">A inteligência que ele usa</h3>
-              <div className="space-y-1">
-                <Label htmlFor="provider">Empresa de inteligência artificial</Label>
-                <Select
-                  value={form.provider}
-                  onValueChange={(v) => changeProvider(v as Provider)}
-                  disabled={disabled}
-                >
-                  <SelectTrigger id="provider">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="google">Google (Gemini)</SelectItem>
-                    <SelectItem value="anthropic">Anthropic</SelectItem>
-                    <SelectItem value="openai">OpenAI</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
               <ModelPicker
                 provider={form.provider}
                 value={form.model}

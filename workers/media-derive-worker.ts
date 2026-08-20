@@ -89,7 +89,7 @@ export async function deriveMessageMedia(row: EventRow): Promise<HandlerResult> 
 
     // Credencial BYOK da org p/ visão (imagem).
     const llmCfg: LlmEdgeConfig = {
-      anthropicApiKey: process.env.ANTHROPIC_API_KEY,
+      openRouterApiKey: process.env.OPENROUTER_API_KEY,
       openaiApiKey: process.env.OPENAI_API_KEY,
       cacheTtl: "1h",
     };

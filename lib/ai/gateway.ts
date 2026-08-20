@@ -11,9 +11,7 @@
  * Only model strings via the gateway-shaped `ai` SDK calls.
  */
 
-import { createAnthropic } from "@ai-sdk/anthropic";
 import { createOpenAI } from "@ai-sdk/openai";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import type { LanguageModel } from "ai";
 
 import { env } from "@/lib/env";
@@ -70,14 +68,8 @@ export const DEFAULT_EMBEDDING_MODEL: ModelId = "openai/text-embedding-3-small";
 
 export async function isAiGatewayConfigured(): Promise<boolean> {
   return (
-    Boolean(env.AI_GATEWAY_API_KEY) ||
     Boolean(env.OPENROUTER_API_KEY) ||
-    Boolean(env.GEMINI_API_KEY) ||
-    Boolean(env.ANTHROPIC_API_KEY) ||
-    Boolean(env.GOOGLE_GENERATIVE_AI_API_KEY) ||
-    Boolean(await loadPlatformSetting("GEMINI_API_KEY")) ||
-    Boolean(await loadPlatformSetting("ANTHROPIC_API_KEY")) ||
-    Boolean(await loadPlatformSetting("OPENAI_API_KEY"))
+    Boolean(await loadPlatformSetting("OPENROUTER_API_KEY"))
   );
 }
 
@@ -109,9 +101,6 @@ export async function isAiGatewayConfigured(): Promise<boolean> {
 export async function resolveLanguageModel(model: ModelId): Promise<LanguageModel | null> {
   const id = String(model);
 
-  const gatewayCfg = await gatewayConfig();
-  if (gatewayCfg) return id as LanguageModel;
-
   const openRouterKey = env.OPENROUTER_API_KEY || await loadPlatformSetting("OPENROUTER_API_KEY");
   if (openRouterKey) {
     return createOpenAI({
@@ -124,62 +113,10 @@ export async function resolveLanguageModel(model: ModelId): Promise<LanguageMode
     })(id);
   }
 
-  const anthropicKey = env.ANTHROPIC_API_KEY || await loadPlatformSetting("ANTHROPIC_API_KEY");
-  if (id.startsWith("anthropic/") && anthropicKey) {
-    return createAnthropic({ apiKey: anthropicKey })(
-      id.slice("anthropic/".length),
-    );
-  }
-
-  const openAiKey = env.OPENAI_API_KEY || await loadPlatformSetting("OPENAI_API_KEY");
-  if (id.startsWith("openai/") && openAiKey) {
-    return createOpenAI({ apiKey: openAiKey })(id.slice("openai/".length));
-  }
-
-  if (id.startsWith("google/")) {
-    const geminiKey = env.GEMINI_API_KEY || env.GOOGLE_GENERATIVE_AI_API_KEY || await loadPlatformSetting("GEMINI_API_KEY");
-    if (geminiKey) {
-      return createGoogleGenerativeAI({ apiKey: geminiKey })(
-        id.slice("google/".length),
-      );
-    } else {
-      logger.warn("[ai-gateway] Nenhuma chave do Google/Gemini configurada para o modelo", { model: id });
-    }
-  }
-
-  logger.error("[ai-gateway] Falha ao resolver o modelo: Nenhuma configuração de provider aplicável ou chave faltando.", { model: id });
+  logger.error("[ai-gateway] Falha ao resolver o modelo: Nenhuma chave do OpenRouter configurada.", { model: id });
   return null;
 }
 
 export function isEmbeddingProviderConfigured(): boolean {
-  // Embeddings go through the gateway when `AI_GATEWAY_API_KEY` is set;
-  // otherwise the worker calls `openai/...` directly via OPENAI_API_KEY.
-  return Boolean(env.AI_GATEWAY_API_KEY) || Boolean(env.OPENAI_API_KEY);
-}
-
-/**
- * Headers that flow with every gateway call. Tenant ID lets the gateway
- * dashboard slice usage per organization; ZDR opts the request out of provider
- * training corpora (privacy-by-default for tenant data).
- */
-export function gatewayHeaders(opts: { organizationId: string }): Record<string, string> {
-  return {
-    "X-AI-Gateway-Tenant-Id": opts.organizationId,
-    "X-AI-Gateway-Zero-Retention": "1",
-  };
-}
-
-/**
- * The `ai` SDK uses `AI_GATEWAY_API_KEY` from process.env automatically when
- * passing string model ids. We surface it here so the worker can fail fast
- * with a clear skip reason, and so future explicit `createGateway()` callers
- * have the canonical place to read config.
- */
-export async function gatewayConfig(): Promise<{ apiKey: string; baseURL?: string } | null> {
-  const gatewayKey = env.AI_GATEWAY_API_KEY || await loadPlatformSetting("AI_GATEWAY_API_KEY");
-  if (!gatewayKey) return null;
-  return {
-    apiKey: gatewayKey,
-    baseURL: env.AI_GATEWAY_BASE_URL || undefined,
-  };
+  return Boolean(env.OPENAI_API_KEY);
 }

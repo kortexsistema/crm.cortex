@@ -18,7 +18,7 @@ import type { CacheTtl } from './stable-prefix';
 /** Config da camada LLM montada do env validado (padrão crmEdgeConfigFromEnv). */
 export interface LlmEdgeConfig {
   /** chave de plataforma (fallback quando a org não tem BYOK). Opcional no boot. */
-  anthropicApiKey?: string;
+  openRouterApiKey?: string;
   /**
    * Mesma ideia para OpenAI. Existia só a da Anthropic, e isso quebrava a
    * transcrição de áudio: o Whisper é da OpenAI, mas a org que usa Anthropic
@@ -35,7 +35,7 @@ export interface LlmEdgeConfig {
 }
 
 export function llmEdgeConfigFromEnv(env: {
-  ANTHROPIC_API_KEY?: string;
+  OPENROUTER_API_KEY?: string;
   LLM_CACHE_TTL?: string;
 }): LlmEdgeConfig {
   const ttl = env.LLM_CACHE_TTL ?? '1h';
@@ -43,7 +43,7 @@ export function llmEdgeConfigFromEnv(env: {
     throw new Error("LLM_CACHE_TTL inválido — use '5m' ou '1h' (default 1h)");
   }
   return {
-    ...(env.ANTHROPIC_API_KEY ? { anthropicApiKey: env.ANTHROPIC_API_KEY } : {}),
+    ...(env.OPENROUTER_API_KEY ? { openRouterApiKey: env.OPENROUTER_API_KEY } : {}),
     cacheTtl: ttl,
   };
 }
@@ -53,7 +53,7 @@ export class LlmNotConfiguredError extends Error {
   override readonly name = 'llm_not_configured';
   constructor() {
     super(
-      'org sem credencial LLM utilizável — cadastre uma chave BYOK ativa/validada em ai_provider_credentials ou defina ANTHROPIC_API_KEY (fallback de plataforma, só provider anthropic)',
+      'org sem credencial LLM utilizável — cadastre uma chave BYOK ativa/validada em ai_provider_credentials ou defina OPENROUTER_API_KEY (fallback de plataforma)',
     );
   }
 }
@@ -72,7 +72,7 @@ export interface OrgLlmConfig {
 // shape errado cai no default, nunca derruba o turno.
 const llmSettingsSchema = z
   .object({
-    provider: z.string().min(1).catch('anthropic'),
+    provider: z.string().min(1).catch('openrouter'),
     default_model: z.string().min(1).nullable().catch(null),
     params: z.record(z.string(), z.unknown()).catch({}),
     enabled_models: z.array(z.string()).catch([]),
@@ -80,7 +80,7 @@ const llmSettingsSchema = z
   })
   .passthrough()
   .catch({
-    provider: 'anthropic',
+    provider: 'openrouter',
     default_model: null,
     params: {},
     enabled_models: [],
@@ -157,8 +157,8 @@ export async function resolveOrgLlmConfig(
       iv: byteaToBuffer(cred.api_key_iv),
       tag: byteaToBuffer(cred.api_key_tag),
     });
-  } else if (provider === 'anthropic' && cfg.anthropicApiKey) {
-    apiKey = cfg.anthropicApiKey;
+  } else if (provider === 'openrouter' && cfg.openRouterApiKey) {
+    apiKey = cfg.openRouterApiKey;
   } else if (provider === 'openai' && cfg.openaiApiKey) {
     apiKey = cfg.openaiApiKey;
   } else {

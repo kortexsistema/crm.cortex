@@ -18,8 +18,6 @@ import { generateText, type LanguageModel } from "ai";
 
 import {
   getDefaultChatModel,
-  gatewayConfig,
-  gatewayHeaders,
   isAiGatewayConfigured,
   isEmbeddingProviderConfigured,
   resolveLanguageModel,
@@ -561,8 +559,6 @@ async function retrieveContext(input: RetrieveInput): Promise<RagHit[]> {
 // o custo e para a auditoria em ai_invocations; o que executa é o provider.
 async function invokeBot(ctx: BotContext, model: LanguageModel): Promise<BotResponse> {
   const renderedSystem = renderSystemPrompt(ctx.agent.system_prompt, ctx);
-  const cfg = await gatewayConfig();
-  const headers = cfg ? gatewayHeaders({ organizationId: ctx.organization_id }) : undefined;
 
   // Build a chronological multi-turn message history. The most recent inbound
   // is the implicit final user turn; we also include it explicitly to be safe.
@@ -582,7 +578,6 @@ async function invokeBot(ctx: BotContext, model: LanguageModel): Promise<BotResp
     model,
     system: renderedSystem,
     messages,
-    headers,
   });
   const latency = Date.now() - start;
 

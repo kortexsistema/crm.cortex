@@ -18,8 +18,6 @@ import {
 } from "@/components/ui/select";
 
 export function AdminAIClient({ initialDefaultModel = "" }: { initialDefaultModel?: string }) {
-  const [geminiKey, setGeminiKey] = useState("");
-  const [anthropicKey, setAnthropicKey] = useState("");
   const [openaiKey, setOpenaiKey] = useState("");
   const [openrouterKey, setOpenrouterKey] = useState("");
   const [defaultModel, setDefaultModel] = useState(initialDefaultModel);
@@ -31,15 +29,17 @@ export function AdminAIClient({ initialDefaultModel = "" }: { initialDefaultMode
       toast.error("Por favor, preencha a chave.");
       return;
     }
+    if (provider === "openrouter" && !key.startsWith("sk-or-v1-")) {
+      toast.error("A chave do OpenRouter deve começar com sk-or-v1-");
+      return;
+    }
     setIsSaving(true);
     const res = await saveGlobalAIKey(provider, key);
     setIsSaving(false);
     
     if (res.ok) {
       toast.success(`Chave global para ${provider} salva com sucesso!`);
-      if (provider === "google") setGeminiKey("");
-      else if (provider === "anthropic") setAnthropicKey("");
-      else if (provider === "openai") setOpenaiKey("");
+      if (provider === "openai") setOpenaiKey("");
       else if (provider === "openrouter") setOpenrouterKey("");
     } else {
       toast.error(res.error || "Erro ao salvar a chave.");
@@ -135,58 +135,33 @@ export function AdminAIClient({ initialDefaultModel = "" }: { initialDefaultMode
 
       <Card>
         <CardHeader>
-          <CardTitle>Google Gemini</CardTitle>
-          <CardDescription>Chave de API do Google AI Studio ou Vertex AI.</CardDescription>
+          <CardTitle>Motor de IA Principal (Chat/Agentes)</CardTitle>
+          <CardDescription>Chave Mestra do OpenRouter para roteamento universal.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <Label htmlFor="gemini">API Key</Label>
+            <Label htmlFor="openrouter">API Key OpenRouter</Label>
             <Input 
-              id="gemini" 
+              id="openrouter" 
               type="password" 
-              placeholder="AIzaSy..." 
-              value={geminiKey}
-              onChange={(e) => setGeminiKey(e.target.value)}
+              placeholder="sk-or-v1-..." 
+              value={openrouterKey}
+              onChange={(e) => setOpenrouterKey(e.target.value)}
             />
           </div>
         </CardContent>
         <CardFooter>
-          <Button disabled={isSaving} onClick={() => handleSave("google", geminiKey)}>
+          <Button disabled={isSaving} onClick={() => handleSave("openrouter", openrouterKey)}>
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Salvar Chave Gemini
+            Salvar Chave OpenRouter
           </Button>
         </CardFooter>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Anthropic Claude</CardTitle>
-          <CardDescription>Chave de API para Claude 3/3.5.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <Label htmlFor="anthropic">API Key</Label>
-            <Input 
-              id="anthropic" 
-              type="password" 
-              placeholder="sk-ant-..." 
-              value={anthropicKey}
-              onChange={(e) => setAnthropicKey(e.target.value)}
-            />
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button disabled={isSaving} onClick={() => handleSave("anthropic", anthropicKey)}>
-            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Salvar Chave Anthropic
-          </Button>
-        </CardFooter>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>OpenAI</CardTitle>
-          <CardDescription>Chave de API para GPT-4o e Embeddings.</CardDescription>
+          <CardTitle>OpenAI (Embeddings e Áudio)</CardTitle>
+          <CardDescription>Chave de API para geração de vetores (RAG) e transcrição Whisper.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -204,30 +179,6 @@ export function AdminAIClient({ initialDefaultModel = "" }: { initialDefaultMode
           <Button disabled={isSaving} onClick={() => handleSave("openai", openaiKey)}>
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Salvar Chave OpenAI
-          </Button>
-        </CardFooter>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>OpenRouter</CardTitle>
-          <CardDescription>Chave de API Mestra do OpenRouter para roteamento universal.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <Label htmlFor="openrouter">API Key</Label>
-            <Input 
-              id="openrouter" 
-              type="password" 
-              placeholder="sk-or-v1-..." 
-              value={openrouterKey}
-              onChange={(e) => setOpenrouterKey(e.target.value)}
-            />
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button disabled={isSaving} onClick={() => handleSave("openrouter", openrouterKey)}>
-            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Salvar Chave OpenRouter
           </Button>
         </CardFooter>
       </Card>

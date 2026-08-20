@@ -84,7 +84,7 @@ async function main(): Promise<void> {
     [ORG, MODEL],
   );
 
-  const cfg = llmEdgeConfigFromEnv({ ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY, LLM_CACHE_TTL: '1h' });
+  const cfg = llmEdgeConfigFromEnv({ OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY, LLM_CACHE_TTL: '1h' });
   const system = bigSystem();
   const tools = {
     consultar_catalogo: tool({

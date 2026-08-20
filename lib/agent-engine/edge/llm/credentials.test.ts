@@ -27,9 +27,9 @@ describe("resolveOrgLlmConfig — chave de plataforma por provider", () => {
     // Anthropic no chat isso lançava LlmNotConfiguredError — ou, pior, o
     // chamador mandava a chave da Anthropic para a OpenAI e levava 401. A
     // OPENAI_API_KEY que o instalador coleta não chegava a lugar nenhum.
-    const cfg: LlmEdgeConfig = { anthropicApiKey: "sk-ant-plataforma", openaiApiKey: "sk-proj-plataforma" };
+    const cfg: LlmEdgeConfig = { openRouterApiKey: "sk-or-v1-plataforma", openaiApiKey: "sk-proj-plataforma" };
     const out = await resolveOrgLlmConfig(
-      poolFake({ provider: "anthropic", default_model: "claude-sonnet-4-6" }, SEM_BYOK),
+      poolFake({ provider: "openrouter", default_model: "meta-llama/llama-3.3-70b-instruct" }, SEM_BYOK),
       cfg,
       "org-1",
       { provider: "openai" },
@@ -38,13 +38,13 @@ describe("resolveOrgLlmConfig — chave de plataforma por provider", () => {
     expect(out.apiKey).toBe("sk-proj-plataforma");
   });
 
-  it("mantém a chave Anthropic do ambiente (comportamento que já existia)", async () => {
+  it("mantém a chave OpenRouter do ambiente (comportamento que já existia)", async () => {
     const out = await resolveOrgLlmConfig(
-      poolFake({ provider: "anthropic", default_model: "claude-sonnet-4-6" }, SEM_BYOK),
-      { anthropicApiKey: "sk-ant-plataforma" },
+      poolFake({ provider: "openrouter", default_model: "meta-llama/llama-3.3-70b-instruct" }, SEM_BYOK),
+      { openRouterApiKey: "sk-or-v1-plataforma" },
       "org-1",
     );
-    expect(out.apiKey).toBe("sk-ant-plataforma");
+    expect(out.apiKey).toBe("sk-or-v1-plataforma");
   });
 
   it("a credencial BYOK da org vence a do ambiente", async () => {

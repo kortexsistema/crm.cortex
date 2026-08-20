@@ -84,19 +84,13 @@ const schema = z.object({
   UPSTASH_REDIS_REST_TOKEN: required("UPSTASH_REDIS_REST_TOKEN"),
 
   // AI providers — env-gated. Worker no-ops with skip="ai_gateway_key_missing"
-  // when AI_GATEWAY_API_KEY is absent, so production boot must not be fatal.
-  AI_GATEWAY_API_KEY: z.string().optional().default(""),
-  AI_GATEWAY_BASE_URL: z.string().optional().default(""),
+  // when OPENROUTER_API_KEY is absent, so production boot must not be fatal.
   // OpenRouter: alternativa ao gateway da Vercel, compatível com a API da
   // OpenAI. Opcional — sem ela nada muda; com ela o chat passa a ser roteado
   // por lá. Ver resolveLanguageModel() em lib/ai/gateway.ts.
   OPENROUTER_API_KEY: z.string().optional().default(""),
   OPENROUTER_BASE_URL: z.string().optional().default(""),
-  VERCEL_AI_GATEWAY_URL: z.string().optional().default(""),
-  ANTHROPIC_API_KEY: z.string().optional().default(""),
   OPENAI_API_KEY: z.string().optional().default(""),
-  GEMINI_API_KEY: z.string().optional().default(""),
-  GOOGLE_GENERATIVE_AI_API_KEY: z.string().optional().default(""),
 
   // Fusão (Fase 4): DONO ÚNICO dos eventos ai_agent.dispatch_requested.
   // 'engine' (default) = o worker agent-engine é o único consumidor (o cron
@@ -191,9 +185,9 @@ export const env = parsed.data;
 
 // Soft warning for env-gated AI keys (worker degrades gracefully but operators
 // should know when the bot is silent for config reasons).
-if (!env.AI_GATEWAY_API_KEY && !env.GEMINI_API_KEY && !env.ANTHROPIC_API_KEY) {
+if (!env.OPENROUTER_API_KEY) {
   console.warn(
-    "[env] No AI_GATEWAY_API_KEY, GEMINI_API_KEY or ANTHROPIC_API_KEY set — ai-response-worker will skip with reason='ai_gateway_key_missing'.",
+    "[env] No OPENROUTER_API_KEY set — ai-response-worker will skip with reason='ai_gateway_key_missing'.",
   );
 }
 if (!env.OPENAI_API_KEY) {

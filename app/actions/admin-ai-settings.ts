@@ -21,9 +21,7 @@ export async function saveGlobalAIKey(provider: string, apiKey: string) {
   const valueTag = bufToBytea(secret.tag);
 
   let settingId = "";
-  if (provider === "google") settingId = "GEMINI_API_KEY";
-  else if (provider === "anthropic") settingId = "ANTHROPIC_API_KEY";
-  else if (provider === "openai") settingId = "OPENAI_API_KEY";
+  if (provider === "openai") settingId = "OPENAI_API_KEY";
   else if (provider === "openrouter") settingId = "OPENROUTER_API_KEY";
   else return { ok: false, error: "Provedor inválido." };
 

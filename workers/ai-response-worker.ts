@@ -156,6 +156,14 @@ export async function processMessageReceived(row: EventRow): Promise<ProcessResu
   }
 
   try {
+    logger.info(`[ai-response-worker] Iniciando geração via modelo ${ctx.agent.model}`, {
+      conversation_id: ctx.conversation_id,
+      message_id: ctx.message_id,
+      organization_id: ctx.organization_id,
+      agent_id: ctx.agent.id,
+      model: ctx.agent.model,
+    });
+
     const response = await invokeBot(ctx, model);
     const post = postProcess(response.text);
 
@@ -238,10 +246,11 @@ export async function processMessageReceived(row: EventRow): Promise<ProcessResu
     return { status: "sent_to_dispatch", outbound_message_id: persisted.outbound_message_id };
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
-    logger.error("[ai-response-worker] invocation failed", {
+    logger.error("[ai-response-worker] invocation failed (Timeout ou erro no AI Gateway / Provider SDK)", {
       conversation_id: ctx.conversation_id,
       message_id: ctx.message_id,
       error: detail,
+      error_stack: err instanceof Error ? err.stack : undefined,
     });
     logInvocation({
       organization_id: ctx.organization_id,
@@ -396,7 +405,16 @@ async function buildContext(input: BuildContextInput): Promise<GuardDecision> {
     .select("organization_id, is_throttled, is_disabled")
     .eq("organization_id", input.organizationId)
     .maybeSingle();
-  if (budget?.is_throttled || budget?.is_disabled) return skip("budget_throttled");
+
+  if (budget?.is_throttled || budget?.is_disabled) {
+    logger.info("[ai-response-worker] budget guard bloqueou a execução", {
+      organization_id_event: input.organizationId,
+      budget_organization_id: budget.organization_id,
+      is_throttled: budget.is_throttled,
+      is_disabled: budget.is_disabled,
+    });
+    return skip("budget_throttled");
+  }
 
   // Recent messages (chronological, last RECENT_MESSAGES_LIMIT)
   const { data: recents } = await admin
@@ -681,6 +699,12 @@ async function persistAndDispatch(
       logger.warn("[ai-response-worker] message.send_requested emit failed", {
         error: emitErr.message,
         message_id: inserted.id,
+      });
+    } else {
+      logger.info("[ai-response-worker] message.send_requested emitido com sucesso (mensagem em status sending)", {
+        message_id: inserted.id,
+        conversation_id: ctx.conversation_id,
+        organization_id: ctx.organization_id,
       });
     }
   }

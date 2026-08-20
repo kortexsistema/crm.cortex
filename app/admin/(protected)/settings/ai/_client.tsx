@@ -15,11 +15,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export function AdminAIClient() {
+export function AdminAIClient({ initialDefaultModel = "" }: { initialDefaultModel?: string }) {
   const [geminiKey, setGeminiKey] = useState("");
   const [anthropicKey, setAnthropicKey] = useState("");
   const [openaiKey, setOpenaiKey] = useState("");
-  const [defaultModel, setDefaultModel] = useState("");
+  const [defaultModel, setDefaultModel] = useState(initialDefaultModel);
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingModel, setIsSavingModel] = useState(false);
 
@@ -84,6 +84,7 @@ export function AdminAIClient() {
               <SelectContent>
                 <SelectItem value="google/gemini-3.5-flash">Gemini 1.5 Flash</SelectItem>
                 <SelectItem value="google/gemini-3.1-pro">Gemini 1.5 Pro</SelectItem>
+                <SelectItem value="google/gemini-2.0-flash">Gemini 2.0 Flash</SelectItem>
                 <SelectItem value="anthropic/claude-sonnet-5">Claude 3.5 Sonnet</SelectItem>
                 <SelectItem value="anthropic/claude-haiku-4-5">Claude 3.5 Haiku</SelectItem>
                 <SelectItem value="openai/gpt-4o">GPT-4o</SelectItem>

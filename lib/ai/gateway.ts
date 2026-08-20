@@ -18,6 +18,7 @@ import type { LanguageModel } from "ai";
 
 import { env } from "@/lib/env";
 import { loadPlatformSetting } from "./credentials";
+import { logger } from "@/lib/logger";
 
 /** Endpoint da OpenRouter. Compatível com a API da OpenAI, então o provider
  *  `@ai-sdk/openai` fala com ela sem dependência nova. */
@@ -27,10 +28,13 @@ export type ModelId =
   | "google/gemini-3.6-flash"
   | "google/gemini-3.5-flash"
   | "google/gemini-2.5-flash"
+  | "google/gemini-2.0-flash"
   | "google/gemini-3.1-pro"
   | "anthropic/claude-sonnet-5"
   | "anthropic/claude-opus-5"
   | "anthropic/claude-haiku-4-5"
+  | "openai/gpt-4o"
+  | "openai/gpt-4o-mini"
   | "openai/text-embedding-3-small"
   // Allow arbitrary tenant-configured strings without losing autocomplete on the canonical ones.
   | (string & {});
@@ -115,9 +119,12 @@ export async function resolveLanguageModel(model: ModelId): Promise<LanguageMode
       return createGoogleGenerativeAI({ apiKey: geminiKey })(
         id.slice("google/".length),
       );
+    } else {
+      logger.warn("[ai-gateway] Nenhuma chave do Google/Gemini configurada para o modelo", { model: id });
     }
   }
 
+  logger.error("[ai-gateway] Falha ao resolver o modelo: Nenhuma configuração de provider aplicável ou chave faltando.", { model: id });
   return null;
 }
 

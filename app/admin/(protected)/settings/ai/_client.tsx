@@ -13,9 +13,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  SelectGroup,
-  SelectLabel,
 } from "@/components/ui/select";
+import { ModelPicker } from "@/app/app/ai/agents/[id]/_components/ModelPicker";
 
 export function AdminAIClient({ initialDefaultModel = "" }: { initialDefaultModel?: string }) {
   const [openaiKey, setOpenaiKey] = useState("");
@@ -93,25 +92,14 @@ export function AdminAIClient({ initialDefaultModel = "" }: { initialDefaultMode
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <Label htmlFor="model-select">Modelo Base</Label>
-            <Select value={defaultModel} onValueChange={setDefaultModel}>
-              <SelectTrigger id="model-select">
-                <SelectValue placeholder="Selecione um modelo..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Modelos Disponíveis</SelectLabel>
-                  <SelectItem value="google/gemini-2.0-flash-exp">Gemini 2.0 Flash Exp</SelectItem>
-                  <SelectItem value="google/gemma-4-31b">Gemma 4 31B</SelectItem>
-                  <SelectItem value="nvidia/nemotron-3-ultra">Nemotron 3 Ultra</SelectItem>
-                  <SelectItem value="zhipu/glm-5.2">GLM 5.2</SelectItem>
-                  <SelectItem value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</SelectItem>
-                  <SelectItem value="anthropic/claude-sonnet-5">Claude Sonnet 5</SelectItem>
-                  <SelectItem value="openai/gpt-4o">GPT-4o</SelectItem>
-                  <SelectItem value="google/gemini-2.5-pro">Gemini 2.5 Pro</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <ModelPicker
+              provider="openrouter"
+              value={defaultModel}
+              onChange={setDefaultModel}
+              label="Modelo Base"
+              placeholder="Selecione um modelo..."
+              id="model-select"
+            />
           </div>
         </CardContent>
         <CardFooter>

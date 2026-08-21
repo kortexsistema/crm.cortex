@@ -28,13 +28,15 @@ interface Props {
   onChange: (modelId: string, ctx?: { contextWindow: number | null }) => void;
   disabled?: boolean;
   id?: string;
+  label?: string;
+  placeholder?: string;
 }
 
 interface ApiResponse {
   data: { models: ModelOption[] };
 }
 
-export function ModelPicker({ provider, value, onChange, disabled, id }: Props) {
+export function ModelPicker({ provider, value, onChange, disabled, id, label = "Modelo", placeholder }: Props) {
   const query = useQuery({
     queryKey: ["ai", "providers", provider, "models"],
     queryFn: async () => {
@@ -48,7 +50,7 @@ export function ModelPicker({ provider, value, onChange, disabled, id }: Props) 
 
   return (
     <div className="space-y-1">
-      <Label htmlFor={id}>Modelo</Label>
+      <Label htmlFor={id}>{label}</Label>
       <Select
         value={value || undefined}
         onValueChange={(v) => {
@@ -58,7 +60,7 @@ export function ModelPicker({ provider, value, onChange, disabled, id }: Props) 
         disabled={disabled || query.isLoading}
       >
         <SelectTrigger id={id}>
-          <SelectValue placeholder={query.isLoading ? "Carregando…" : "Selecione um modelo"} />
+          <SelectValue placeholder={query.isLoading ? "Carregando…" : (placeholder || "Selecione um modelo")} />
         </SelectTrigger>
         <SelectContent>
           {models.map((m) => (

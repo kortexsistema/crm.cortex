@@ -42,9 +42,7 @@ export class WahaChannelAdapter implements ChannelAdapter {
 
   async send(input: ChannelSendInput): Promise<ChannelSendResult> {
     try {
-      // WAHA ignora metadados de template e envia apenas o texto renderizado (body).
-      const wahaInput = { ...input, template: undefined };
-      const outcome = await sendTurnMessage(this.db, this.crmCfg, wahaInput);
+      const outcome = await sendTurnMessage(this.db, this.crmCfg, input);
       switch (outcome.kind) {
         case 'sent':
           return { kind: 'sent', idempotencyKey: outcome.idempotencyKey, messageId: outcome.crmMessageId };

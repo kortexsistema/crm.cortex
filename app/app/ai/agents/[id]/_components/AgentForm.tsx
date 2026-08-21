@@ -69,6 +69,7 @@ interface BaseProps {
   routerMembership?: { routerId: string; routerName: string } | null;
   readOnly?: boolean;
   isPlatformAdmin?: boolean;
+  defaultModel?: string;
 }
 
 interface EditProps extends BaseProps {
@@ -129,14 +130,15 @@ const DEFAULT_TRIGGER: TriggerValue = {
 function buildState(args: {
   agent?: AgentRow;
   version: AgentVersionRow | null;
+  defaultModel?: string;
 }): FormState {
-  const { agent, version } = args;
+  const { agent, version, defaultModel } = args;
   return {
     name: agent?.name ?? "",
     description: agent?.description ?? "",
     priority: agent?.priority ?? 0,
     provider: (version?.provider as Provider) ?? "openrouter",
-    model: version?.model || "meta-llama/llama-3.3-70b-instruct:free",
+    model: version?.model || defaultModel || "meta-llama/llama-3.3-70b-instruct:free",
     credential_id: version?.credential_id ?? "",
     channel_session_id: version?.channel_session_id ?? "",
     system_prompt:
@@ -193,12 +195,18 @@ export function AgentForm(props: Props) {
   const baseline = React.useMemo(() => {
     if (isEdit) {
       const ref = props.draft ?? props.published;
-      return buildState({ agent: props.agent, version: ref });
+      return buildState({ agent: props.agent, version: ref, defaultModel: props.defaultModel });
     }
-    return buildState({ version: null });
+    return buildState({ version: null, defaultModel: props.defaultModel });
   }, [isEdit, props]);
 
-  const [form, setForm] = React.useState<FormState>(baseline);
+  const [form, setForm] = React.useState<FormState>(() =>
+    buildState({
+      agent: isEdit ? props.agent : undefined,
+      version: isEdit ? (props.draft ?? props.published) : null,
+      defaultModel: props.defaultModel,
+    }),
+  );
   const [saving, setSaving] = React.useState(false);
   const [publishing, setPublishing] = React.useState(false);
   const [confirmOpen, setConfirmOpen] = React.useState(false);

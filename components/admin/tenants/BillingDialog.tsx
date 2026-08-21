@@ -59,6 +59,7 @@ export function BillingDialog({ open, onClose, organization }: BillingDialogProp
       queryClient.invalidateQueries({ queryKey: ["admin", "tenants"] });
       onClose();
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
       setError(err.message || "Erro ao atualizar dados.");
     },

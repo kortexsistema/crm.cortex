@@ -10,6 +10,7 @@ import type { CredentialRow } from "@/hooks/ai/useCredentials";
 
 import { AgentEditorClient } from "./_client";
 import { AgentTabs } from "./_components/AgentTabs";
+import { getDefaultChatModel } from "@/lib/ai/gateway";
 
 export const dynamic = "force-dynamic";
 
@@ -59,7 +60,7 @@ export default async function AgentEditorPage({
   }
 
   // mcp_agent: busca versions + lookups.
-  const [versionsRes, credentialsRes, channelSessions, routerMemberRes] = await Promise.all([
+  const [versionsRes, credentialsRes, channelSessions, routerMemberRes, defaultModel] = await Promise.all([
     supabase
       .from("ai_agent_versions")
       .select(VERSION_COLUMNS)
@@ -78,6 +79,7 @@ export default async function AgentEditorPage({
       .eq("agent_id", id)
       .limit(1)
       .maybeSingle(),
+    getDefaultChatModel(),
   ]);
 
   const versions = (versionsRes.data ?? []) as unknown as AgentVersionRow[];
@@ -108,6 +110,7 @@ export default async function AgentEditorPage({
         routerMembership={routerMembership}
         readOnly={readOnly}
         isPlatformAdmin={user.is_platform_admin}
+        defaultModel={defaultModel}
       />
     </div>
   );

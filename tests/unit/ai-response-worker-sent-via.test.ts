@@ -35,12 +35,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // Sem chave de embedding o RAG é pulado, então a confiança é 0 — é isso que
 // deixa o gatilho G3 controlável só pelo `confidence_threshold` do agente.
 const envMock: Record<string, string> = {
-  ANTHROPIC_API_KEY: "sk-ant-teste",
-  AI_GATEWAY_API_KEY: "",
-  AI_GATEWAY_BASE_URL: "",
-  OPENROUTER_API_KEY: "",
-  OPENROUTER_BASE_URL: "",
-  OPENAI_API_KEY: "",
+  OPENROUTER_API_KEY: "sk-or-teste",
 };
 vi.mock("@/lib/env", () => ({
   get env() {

@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { CredentialRow } from "@/hooks/ai/useCredentials";
 
 import { AgentForm } from "../[id]/_components/AgentForm";
+import { getDefaultChatModel } from "@/lib/ai/gateway";
 
 export const dynamic = "force-dynamic";
 
@@ -22,12 +23,13 @@ export default async function NewAgentPage() {
   }
 
   const supabase = await createClient();
-  const [credentialsRes, channelSessions] = await Promise.all([
+  const [credentialsRes, channelSessions, defaultModel] = await Promise.all([
     supabase
       .from("ai_provider_credentials_safe")
       .select(CREDENTIAL_COLUMNS)
       .eq("organization_id", activeOrg.orgId),
     listSelectableChannels(supabase, activeOrg.orgId),
+    getDefaultChatModel(),
   ]);
 
   const credentials = (credentialsRes.data ?? []) as unknown as CredentialRow[];
@@ -39,6 +41,7 @@ export default async function NewAgentPage() {
         credentials={credentials}
         channelSessions={channelSessions}
         isPlatformAdmin={user.is_platform_admin}
+        defaultModel={defaultModel}
       />
     </div>
   );

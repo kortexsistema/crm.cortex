@@ -157,8 +157,27 @@ export async function resolveOrgLlmConfig(
       iv: byteaToBuffer(cred.api_key_iv),
       tag: byteaToBuffer(cred.api_key_tag),
     });
-  } else if (provider === 'openrouter' && cfg.openRouterApiKey) {
-    apiKey = cfg.openRouterApiKey;
+  } else if (provider === 'openrouter') {
+    const { rows: platformRows } = await db.query<{
+      value_encrypted: unknown;
+      value_iv: unknown;
+      value_tag: unknown;
+    }>(
+      `select value_encrypted, value_iv, value_tag
+       from platform_settings
+       where id = 'OPENROUTER_API_KEY'`
+    );
+    if (platformRows.length > 0 && platformRows[0] !== undefined) {
+      apiKey = decryptKey({
+        ciphertext: byteaToBuffer(platformRows[0].value_encrypted),
+        iv: byteaToBuffer(platformRows[0].value_iv),
+        tag: byteaToBuffer(platformRows[0].value_tag),
+      });
+    } else if (cfg.openRouterApiKey) {
+      apiKey = cfg.openRouterApiKey;
+    } else {
+      throw new LlmNotConfiguredError();
+    }
   } else if (provider === 'openai' && cfg.openaiApiKey) {
     apiKey = cfg.openaiApiKey;
   } else {

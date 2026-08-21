@@ -162,6 +162,7 @@ function evaluateCondition(
 ): string | boolean {
   if ('rules' in config) {
     for (const rule of config.rules) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const results = rule.checks.map((check) => evaluateCheck(check as any, lead));
       const passed = rule.combinator === "and" ? results.every(Boolean) : results.some(Boolean);
       if (passed) return rule.id;
@@ -169,6 +170,7 @@ function evaluateCondition(
     return "fallback";
   } else {
     // legacy format
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const results = config.checks.map((check) => evaluateCheck(check as any, lead));
     return config.combinator === "and" ? results.every(Boolean) : results.some(Boolean);
   }

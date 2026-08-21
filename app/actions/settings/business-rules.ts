@@ -35,8 +35,8 @@ export async function saveBusinessRules(content: string): Promise<SaveBusinessRu
   // Validate the playbook format (must have a ## heading and <= 200 lines)
   try {
     validatePlaybookLayerContent(parsed.data.content);
-  } catch (err: any) {
-    return { ok: false, error: "invalid_format", details: err.message };
+  } catch (err: unknown) {
+    return { ok: false, error: "invalid_format", details: err instanceof Error ? err.message : String(err) };
   }
 
   const supabase = createAdminClient();

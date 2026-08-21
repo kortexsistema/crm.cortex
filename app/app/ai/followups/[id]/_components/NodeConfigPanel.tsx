@@ -147,6 +147,7 @@ function WaitForm({
     offsetMin: number;
     guidance: string;
   }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let candidate: any;
     if (next.mode === "fixed") {
       candidate = { mode: "fixed" as const, duration_ms: minToMs(next.durationMin) };
@@ -395,6 +396,7 @@ function ConditionForm({
                   value={check.field}
                   onValueChange={(v) => {
                     const next = [...rules];
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     next[rIdx]!.checks[cIdx]!.field = v as any;
                     setRules(next);
                     commit(next, fallbackLabel);
@@ -413,6 +415,7 @@ function ConditionForm({
                   value={check.op}
                   onValueChange={(v) => {
                     const next = [...rules];
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     next[rIdx]!.checks[cIdx]!.op = v as any;
                     setRules(next);
                     commit(next, fallbackLabel);

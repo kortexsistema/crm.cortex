@@ -22,7 +22,7 @@ export interface AdminTenantRow {
     subscription_status?: "active" | "pending_payment" | "expiring" | "suspended" | null;
     billing_due_date?: string | null;
     billing_contact_phone?: string | null;
-    [key: string]: any;
+    [key: string]: unknown;
   } | null;
 }
 

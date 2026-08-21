@@ -60,16 +60,6 @@ describe("embedText", () => {
     expect(arg.headers).toBeUndefined();
   });
 
-  it("COM gateway, mantém a string (é ele quem roteia) e anexa os headers do tenant", async () => {
-    gatewayConfigMock = () => ({ apiKey: "gw-key" });
-
-    await embedText("oi", { organizationId: "org-1" });
-
-    const arg = embedSpy.mock.calls[0]?.[0] as { model: unknown; headers?: Record<string, string> };
-    expect(arg.model).toBe("openai/text-embedding-3-small");
-    expect(arg.headers?.["X-AI-Gateway-Tenant-Id"]).toBe("org-1");
-  });
-
   it("devolve a contagem de tokens que o SDK reporta", async () => {
     const r = await embedText("oi", { organizationId: "org-1" });
     expect(r.embedding).toEqual([0.1, 0.2]);

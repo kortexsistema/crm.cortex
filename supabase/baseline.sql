@@ -9371,3 +9371,11 @@ END;
 REVOKE EXECUTE ON FUNCTION public.decrement_tenant_tokens(uuid, integer) FROM public, anon;
 GRANT EXECUTE ON FUNCTION public.decrement_tenant_tokens(uuid, integer) TO service_role;
 
+
+-- ---------------------------------------------------------------------------
+-- Apêndice: Corrigir restrição de provedores para aceitar openrouter
+-- ---------------------------------------------------------------------------
+ALTER TABLE public.ai_models DROP CONSTRAINT IF EXISTS ai_models_provider_check;
+ALTER TABLE public.ai_models ADD CONSTRAINT ai_models_provider_check 
+CHECK (provider IN ('openrouter', 'google', 'anthropic', 'openai'));
+

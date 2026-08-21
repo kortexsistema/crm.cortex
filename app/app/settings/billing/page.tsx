@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Faturamento — Kortex" };
+export const metadata = { title: "Faturamento" };
 
 export default async function BillingPage() {
   const user = await requireAuth();

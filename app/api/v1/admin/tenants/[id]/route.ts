@@ -209,7 +209,7 @@ export async function PATCH(
     return fail("not_found", "Tenant not found", 404, { requestId });
   }
 
-  const currentSettings = (org.settings as Record<string, any>) || {};
+  const currentSettings = (org.settings as Record<string, unknown>) || {};
   
   const newSettings = {
     ...currentSettings,
@@ -231,7 +231,7 @@ export async function PATCH(
     suspendedAt = null;
   }
 
-  const updatePayload: any = { settings: newSettings };
+  const updatePayload: Record<string, unknown> = { settings: newSettings };
   if (systemStatus !== org.status) {
     updatePayload.status = systemStatus;
     if (suspendedAt !== undefined) {

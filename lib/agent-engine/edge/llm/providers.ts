@@ -3,8 +3,6 @@
  * edge/llm/) onde SDK de vendor é importado. Instância POR CHAMADA com a chave
  * BYOK da org: sem pool global de chave, sem fallback silencioso.
  */
-import { createAnthropic } from '@ai-sdk/anthropic';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createOpenAI } from '@ai-sdk/openai';
 import type { LanguageModel } from 'ai';
 import { MockLanguageModelV3 } from 'ai/test';
@@ -23,6 +21,7 @@ export type ProviderRegistry = Record<string, (apiKey: string, modelId: string) 
 const ANTHROPIC_ENDPOINT = 'https://api.anthropic.com';
 const OPENAI_ENDPOINT = 'https://api.openai.com';
 const GOOGLE_ENDPOINT = 'https://generativelanguage.googleapis.com';
+const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1';
 
 /**
  * Providers reais do lançamento. Sonnet (Anthropic) é o default RECOMENDADO —
@@ -45,12 +44,12 @@ export function createDefaultRegistry(opts?: { allowedHosts?: string[] }): Provi
     };
   };
   return {
-    anthropic: (apiKey, modelId) =>
-      createAnthropic({ apiKey, fetch: contain(ANTHROPIC_ENDPOINT) })(modelId),
-    openai: (apiKey, modelId) =>
-      createOpenAI({ apiKey, fetch: contain(OPENAI_ENDPOINT) })(modelId),
-    google: (apiKey, modelId) =>
-      createGoogleGenerativeAI({ apiKey, fetch: contain(GOOGLE_ENDPOINT) })(modelId),
+    openrouter: (apiKey, modelId) =>
+      createOpenAI({
+        baseURL: OPENROUTER_ENDPOINT,
+        apiKey,
+        fetch: contain(OPENROUTER_ENDPOINT),
+      })(modelId),
   };
 }
 

@@ -223,4 +223,5 @@ export type AuditAction =
   | "platform_admin.tenant_updated"
   | "platform.settings.ai_key_updated"
   | "platform.tenant.tokens_granted"
-  | "tenant.tokens_extra.requested";
+  | "tenant.tokens_extra.requested"
+  | "platform.settings.models_synced";

@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { saveGlobalAIKey, saveGlobalModelSetting } from "@/app/actions/admin-ai-settings";
+import { saveGlobalAIKey, saveGlobalModelSetting, syncOpenRouterModels } from "@/app/actions/admin-ai-settings";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import {
@@ -23,6 +23,19 @@ export function AdminAIClient({ initialDefaultModel = "" }: { initialDefaultMode
   const [defaultModel, setDefaultModel] = useState(initialDefaultModel);
   const [isSaving, setIsSaving] = useState(false);
   const [isSavingModel, setIsSavingModel] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  async function handleSyncModels() {
+    setIsSyncing(true);
+    const res = await syncOpenRouterModels();
+    setIsSyncing(false);
+    
+    if (res.ok) {
+      toast.success(`${res.count} modelos sincronizados com sucesso!`);
+    } else {
+      toast.error(res.error || "Erro ao sincronizar modelos.");
+    }
+  }
 
   async function handleSave(provider: string, key: string) {
     if (!key) {
@@ -155,6 +168,19 @@ export function AdminAIClient({ initialDefaultModel = "" }: { initialDefaultMode
           <Button disabled={isSaving} onClick={() => handleSave("openai", openaiKey)}>
             {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Salvar Chave OpenAI
+          </Button>
+        </CardFooter>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Sincronização de Modelos</CardTitle>
+          <CardDescription>Sincroniza a lista de modelos de chat disponíveis diretamente da OpenRouter para o banco de dados da plataforma.</CardDescription>
+        </CardHeader>
+        <CardFooter>
+          <Button disabled={isSyncing} onClick={handleSyncModels}>
+            {isSyncing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Sincronizar Modelos com a OpenRouter
           </Button>
         </CardFooter>
       </Card>

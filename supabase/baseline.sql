@@ -9365,11 +9365,10 @@ RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
 
-ALTER TABLE public.ai_models DROP CONSTRAINT IF EXISTS ai_models_provider_check;
-ALTER TABLE public.ai_models ADD CONSTRAINT ai_models_provider_check 
-CHECK (provider IN ('openrouter', 'google', 'anthropic', 'openai'));
-
 REVOKE EXECUTE ON FUNCTION public.decrement_tenant_tokens(uuid, integer) FROM public, anon;
 GRANT EXECUTE ON FUNCTION public.decrement_tenant_tokens(uuid, integer) TO service_role;
 
-
+-- Garante que o provedor 'openrouter' é aceito na tabela ai_models
+ALTER TABLE public.ai_models DROP CONSTRAINT IF EXISTS ai_models_provider_check;
+ALTER TABLE public.ai_models ADD CONSTRAINT ai_models_provider_check 
+CHECK (provider IN ('openrouter', 'google', 'anthropic', 'openai'));

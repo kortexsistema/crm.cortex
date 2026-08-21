@@ -164,6 +164,28 @@ export async function processSentiment(event: EventRow): Promise<SentimentResult
         | undefined;
       promptTokens = usage?.inputTokens ?? usage?.promptTokens ?? 0;
       completionTokens = usage?.outputTokens ?? usage?.completionTokens ?? 0;
+    } catch (err) {
+      clearTimeout(timeout);
+      const detail = err instanceof Error ? err.message : String(err);
+      console.warn("[ai-sentiment-worker] generateObject failed", {
+        message_id: messageId,
+        error: detail,
+      });
+      logInvocation({
+        organization_id: event.organization_id,
+        agent_id: agent?.id ?? null,
+        conversation_id: conversationId ?? message.conversation_id ?? null,
+        message_id: messageId,
+        invocation_kind: "sentiment_classify",
+        model: sentimentModelId,
+        prompt_tokens: 0,
+        completion_tokens: 0,
+        latency_ms: 0,
+        cost_cents: 0,
+        finish_reason: "error",
+        error_payload: { message: detail },
+      });
+      return { skipped: true, reason: "upstream_model_error" };
     } finally {
       clearTimeout(timeout);
     }

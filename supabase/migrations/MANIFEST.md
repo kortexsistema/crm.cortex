@@ -1,4 +1,4 @@
-﻿# Migration Manifest — Kortex
+# Migration Manifest — Kortex
 
 Migrations applied to Supabase project `rrydmwnporysaiysiztn` (sa-east-1, Postgres 17) via Supabase MCP on 2026-04-28.
 
@@ -154,6 +154,12 @@ aplica.
 | `20260806140000` | `0116_playbook_domain_layer` | Fase 2.2 do SaaS Pivot: Adiciona a camada `domain` ao sistema de `Playbook`. Modifica a constraint `playbook_versions_layer_check` e `playbook_pointers_layer_check` para aceitar a string 'domain'. Permite a injeção nativa de regras de negócios, tom de voz e restrições diretamente no System Prompt dos LLMs sem inchar as tabelas de configuração da tenant. NNNN=0116. |
 | `20260806150000` | `0117_auto_provision_org` | Database trigger `on_auth_user_created` em `auth.users` para provisionamento atômico e automático de tenant padrão + vínculo de admin em `user_organizations` ou `tenant_members` no ato do cadastro, imune à tabela e previne orfandade via SSO ou dashboard. NNNN=0117. |
 | `20260807215000` | `0119_handle_new_user_opt_out` | Atualiza o trigger `handle_new_user` adicionando early return (`skip_org_provision` no `user_metadata`) para evitar duplo-provisionamento quando a criação do usuário é feita pelo Super Admin no endpoint de Tenants. NNNN=0119. |
+| `20260818175000` | `0120_ai_agent_default_gemini` | Altera o valor padro da coluna model em ai_agents para google/gemini-1.5-flash, tornando o Gemini a IA padro do sistema em vez do Anthropic. Idempotente (apenas altera o schema default). |
+| `20260819074500` | `0121_update_gemini_models` | Adiciona as novas verses do Gemini e altera o valor padro da coluna model em ai_agents para google/gemini-3.5-flash. |
+| `20260819115500` | `0122_agent_optional_credential` | Permite que a credencial do agente seja opcional, usando fallback. |
+| `20260819120000` | `0123_add_tenant_tokens_and_platform_settings` | Adiciona tabela de platform_settings e tokens por tenant. |
+| `20260820164000` | `0125_openrouter_models` | Adiciona os novos modelos do OpenRouter, deprecia os antigos, e atualiza agentes para o novo modelo default Llama 3.3 70B (Gratuito). |
+| `20260821000000` | `0126_openrouter_constraints` | Atualiza as constraints CHECK (provider IN (...)) das tabelas ai_provider_credentials, ai_agent_versions e ai_models para incluir o provedor 'openrouter'. |
 
 ## Reproducibility
 

@@ -62,7 +62,7 @@ const versionShapeSchema = z
   .object({
     system_prompt: z.string().trim().min(10).max(20000),
     provider: z.enum(PROVIDERS),
-    model: z.string().trim().min(1).max(120),
+    model: z.string().trim().min(1).max(200),
     credential_id: UUID.nullable().optional(),
     tool_ids: z
       .array(z.string().min(1).max(80))

@@ -264,7 +264,7 @@ export async function processMessageReceived(row: EventRow): Promise<ProcessResu
       finish_reason: "error",
       error_payload: { message: detail },
     });
-    return { status: "error", detail };
+    return { status: "skipped", reason: "upstream_model_error", detail };
   }
 }
 

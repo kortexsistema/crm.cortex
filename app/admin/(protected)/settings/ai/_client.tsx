@@ -87,39 +87,15 @@ export function AdminAIClient({ initialDefaultModel = "" }: { initialDefaultMode
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectLabel>Gratuitos para Testes (OpenRouter)</SelectLabel>
-                  <SelectItem value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B Instruct</SelectItem>
-                  <SelectItem value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash (Exp)</SelectItem>
-                  <SelectItem value="google/gemini-2.0-pro-exp-02-05:free">Gemini 2.0 Pro (Exp)</SelectItem>
-                </SelectGroup>
-                <SelectGroup>
-                  <SelectLabel>Atendimento Humanizado</SelectLabel>
+                  <SelectLabel>Modelos Disponíveis</SelectLabel>
+                  <SelectItem value="google/gemini-2.0-flash-exp">Gemini 2.0 Flash Exp</SelectItem>
+                  <SelectItem value="google/gemma-4-31b">Gemma 4 31B</SelectItem>
+                  <SelectItem value="nvidia/nemotron-3-ultra">Nemotron 3 Ultra</SelectItem>
+                  <SelectItem value="zhipu/glm-5.2">GLM 5.2</SelectItem>
                   <SelectItem value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</SelectItem>
-                  <SelectItem value="anthropic/claude-3-5-haiku-20241022">Claude 3.5 Haiku</SelectItem>
+                  <SelectItem value="anthropic/claude-sonnet-5">Claude Sonnet 5</SelectItem>
                   <SelectItem value="openai/gpt-4o">GPT-4o</SelectItem>
-                  <SelectItem value="openai/gpt-4o-mini">GPT-4o Mini</SelectItem>
-                </SelectGroup>
-                <SelectGroup>
-                  <SelectLabel>Google Gemini</SelectLabel>
-                  <SelectItem value="google/gemini-1.5-pro">Gemini 1.5 Pro</SelectItem>
-                  <SelectItem value="google/gemini-1.5-flash">Gemini 1.5 Flash</SelectItem>
-                  <SelectItem value="google/gemini-2.0-flash-001">Gemini 2.0 Flash</SelectItem>
-                  <SelectItem value="google/gemini-2.0-pro-exp-02-05">Gemini 2.0 Pro (Exp)</SelectItem>
-                </SelectGroup>
-                <SelectGroup>
-                  <SelectLabel>Outros Provedores</SelectLabel>
-                  <SelectItem value="deepseek/deepseek-chat">DeepSeek Chat</SelectItem>
-                  <SelectItem value="deepseek/deepseek-r1">DeepSeek R1</SelectItem>
-                  <SelectItem value="meta-llama/llama-3.3-70b-instruct">Llama 3.3 70B</SelectItem>
-                  <SelectItem value="qwen/qwen-2.5-72b-instruct">Qwen 2.5 72B</SelectItem>
-                </SelectGroup>
-                <SelectGroup>
-                  <SelectLabel>Compatibilidade Legada</SelectLabel>
-                  <SelectItem value="google/gemini-3.5-flash">Gemini 1.5 Flash (Legacy)</SelectItem>
-                  <SelectItem value="google/gemini-3.1-pro">Gemini 1.5 Pro (Legacy)</SelectItem>
-                  <SelectItem value="google/gemini-2.0-flash">Gemini 2.0 Flash (Legacy)</SelectItem>
-                  <SelectItem value="anthropic/claude-sonnet-5">Claude 3.5 Sonnet (Legacy)</SelectItem>
-                  <SelectItem value="anthropic/claude-haiku-4-5">Claude 3.5 Haiku (Legacy)</SelectItem>
+                  <SelectItem value="google/gemini-2.5-pro">Gemini 2.5 Pro</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

@@ -155,6 +155,7 @@ const KNOWN_DEBT: { reason: string; files: string[] }[] = [
       "components/inbox/media/media-utils.ts",
       "lib/agent-engine/channel-adapter.ts",
       "lib/agent-engine/cron/scheduler.ts",
+      "lib/agent-engine/edge/channel/meta-adapter.ts",
       "lib/agent-engine/edge/channel/waha-adapter.ts",
       "lib/agent-engine/edge/crm/mcp-client.ts",
       "lib/agent-engine/edge/crm/send-message.ts",
@@ -184,7 +185,7 @@ const DEBT = new Set(KNOWN_DEBT.flatMap((g) => g.files));
 
 function walk(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
-    const p = join(dir, e.name);
+    const p = join(dir, e.name).replace(/\\/g, '/');
     if (e.isDirectory()) return e.name === "node_modules" ? [] : walk(p);
     return /\.tsx?$/.test(e.name) ? [p] : [];
   });

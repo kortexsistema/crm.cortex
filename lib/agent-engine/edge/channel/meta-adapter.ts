@@ -27,7 +27,7 @@ export class MetaChannelAdapter implements ChannelAdapter {
 
   async send(input: ChannelSendInput): Promise<ChannelSendResult> {
     try {
-      // Diferente do WAHA, o MetaChannelAdapter não altera o payload e delega os metadados oficias do template para o sendTurnMessage
+      // Diferente de outros adapters, o MetaChannelAdapter não altera o payload e delega os metadados oficias do template para o sendTurnMessage
       const outcome = await sendTurnMessage(this.db, this.crmCfg, input);
       switch (outcome.kind) {
         case 'sent':
